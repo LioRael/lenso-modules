@@ -1,6 +1,6 @@
 schema_version = 1
 [modules.auth]
-version = "0.1.0"
+version = "0.2.0"
 [modules.auth.supports]
 language = ["rust"]
 runtime = ["tokio"]
@@ -15,20 +15,29 @@ version = "^0.1"
 contract = "lenso.password-hasher"
 version = "^0.1"
 [modules.sqlite]
-version = "0.1.0"
+version = "0.2.0"
 [modules.sqlite.provides."lenso.auth-store"]
 version = "0.1.0"
 [modules.sqlite.options.path]
 prompt = "SQLite database path"
 kind = { type = "text" }
 default = "auth.sqlite"
-[modules.scrypt]
+[modules.postgres]
+version = "0.2.0"
+[modules.postgres.provides."lenso.auth-store"]
 version = "0.1.0"
+[modules.postgres.options.connection]
+prompt = "PostgreSQL connection environment variable"
+kind = { type = "environment" }
+default = { env = "DATABASE_URL" }
+[modules.scrypt]
+version = "0.2.0"
 [modules.scrypt.provides."lenso.password-hasher"]
 version = "0.1.0"
 [resources]
 auth = [{ path = "rust/src/modules/auth/mod.rs", target = "mod.rs" }]
 sqlite = [{ path = "rust/src/modules/sqlite/mod.rs", target = "mod.rs" }, { path = "rust/src/modules/sqlite/schema.sql", target = "schema.sql" }]
+postgres = [{ path = "rust/src/modules/postgres/mod.rs", target = "mod.rs" }, { path = "rust/src/modules/postgres/schema.sql", target = "schema.sql" }]
 scrypt = [{ path = "rust/src/modules/scrypt/mod.rs", target = "mod.rs" }]
 [generator]
 schema_version = 1
@@ -36,9 +45,15 @@ directory = "generated/auth"
 files = [{scope="composition", template="templates/rust/assembly.rs.j2", target="mod.rs"}]
 [samples.default]
 instances = { auth = "auth" }
+bindings = { "auth.store" = { type="module", module="sqlite" } }
 context = {language="rust", runtime="tokio"}
 [samples.multiple]
 instances = { customer = "auth", staff = "auth" }
+bindings = { "customer.store" = { type="module", module="sqlite" }, "staff.store" = { type="module", module="sqlite" } }
+context = {language="rust", runtime="tokio"}
+[samples.postgres]
+instances = { auth = "auth" }
+bindings = { "auth.store" = { type="module", module="postgres" } }
 context = {language="rust", runtime="tokio"}
 
 [[generator.dependencies]]
@@ -103,3 +118,31 @@ package="subtle"
 version="2"
 module="scrypt"
 options={}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="tokio-postgres"
+version="0.7"
+module="postgres"
+options={}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="postgres-native-tls"
+version="0.5"
+module="postgres"
+options={}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="native-tls"
+version="0.2"
+module="postgres"
+options={}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="tokio"
+version="1"
+module="postgres"
+options={features=["rt", "sync", "net", "time"]}

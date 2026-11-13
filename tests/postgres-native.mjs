@@ -1,0 +1,46 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { randomBytes } from "node:crypto";
+import { Pool } from "pg";
+import { Executor } from "@lenso/app";
+import { PostgresAuthStore } from "../typescript/dist/modules/postgres/store.js";
+import { ScryptHasher } from "../typescript/dist/modules/scrypt/hasher.js";
+import { authModule, tokenHash } from "../typescript/dist/modules/auth/core.js";
+const connectionString = process.env.AUTH_POSTGRES_URL;
+assert(connectionString, "AUTH_POSTGRES_URL must point to a disposable test database");
+test("PostgreSQL Auth: migrations, concurrent uniqueness, isolation, secrets, expiry and restart", async t => {
+ const realm="ts_"+randomBytes(8).toString("hex");
+ const a=new PostgresAuthStore({connectionString},realm),b=new PostgresAuthStore({connectionString},realm);
+ const other=new PostgresAuthStore({connectionString},realm+"_other");
+ const db=new Pool({connectionString});
+ t.after(async()=>{await a.close();await b.close();await other.close();await db.end();});
+ await Promise.all([a.migrate(),b.migrate()]);await a.checkSchema();
+ let now=1700000000000;
+ const app=authModule({store:a,passwords:new ScryptHasher(),now:()=>now,sessionTtlMs:60000},realm);
+ const executor=new Executor(()=>{});
+ const call=(action,input,principal)=>executor.callExternal(app.actions[action],{callId:"pg-test",resources:app.resources,principal,signal:new AbortController().signal},input);
+ const input={name:"Alice",password:"correct horse battery"};
+ const racing=await Promise.allSettled([call("register",input),call("register",{...input,name:"ALICE"})]);
+ assert.equal(racing.filter(x=>x.status==="fulfilled").length,1);
+ assert.equal(racing.find(x=>x.status==="rejected").reason.code,"conflict");
+ const session=await call("login",input);
+ const principal=await app.principal(session.token);assert(principal);
+ assert.equal((await call("session",null,principal)).name,"alice");
+ await assert.rejects(call("login",{...input,password:"wrong password"}),{code:"unauthenticated"});
+ const saved=(await db.query("SELECT token_hash,password_hash FROM lenso_auth_sessions s JOIN lenso_auth_users u ON s.realm=u.realm AND s.subject=u.id WHERE s.realm=$1",[realm])).rows[0];
+ assert.equal(saved.token_hash,tokenHash(session.token));assert.notEqual(saved.token_hash,session.token);assert(!saved.password_hash.includes(input.password));
+ assert(await b.session(tokenHash(session.token),now));
+ assert.equal(await other.session(tokenHash(session.token),now),undefined);
+ await other.createUser("alice","opaque hash");
+ await other.revokeSession(tokenHash(session.token),principal.subject);assert(await app.principal(session.token));
+ await call("logout",{token:session.token},principal);assert.equal(await b.session(tokenHash(session.token),now),undefined);
+ const expiring=await call("login",input);now=expiring.expiresMs;assert.equal(await app.principal(expiring.token),undefined);
+ const persistent=await call("login",input);await a.close();
+ const reopened=new PostgresAuthStore({connectionString},realm);t.after(()=>reopened.close());
+ assert(await reopened.session(tokenHash(persistent.token),now));
+ await assert.rejects(b.saveSession("invalid-fk","missing-user",now+1000),{code:"internal"});
+ await db.query("INSERT INTO lenso_auth_migrations(version) VALUES(2)");
+ try { await assert.rejects(b.migrate(),{code:"internal"});assert(await b.credential("alice")); }
+ finally {await db.query("DELETE FROM lenso_auth_migrations WHERE version=2");}
+ await b.checkSchema();
+});

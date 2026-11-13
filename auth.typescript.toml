@@ -1,6 +1,6 @@
 schema_version = 1
 [modules.auth]
-version = "0.1.0"
+version = "0.2.0"
 [modules.auth.supports]
 language = ["typescript"]
 runtime = ["node26"]
@@ -15,20 +15,29 @@ version = "^0.1"
 contract = "lenso.password-hasher"
 version = "^0.1"
 [modules.sqlite]
-version = "0.1.0"
+version = "0.2.0"
 [modules.sqlite.provides."lenso.auth-store"]
 version = "0.1.0"
 [modules.sqlite.options.path]
 prompt = "SQLite database path"
 kind = { type = "text" }
 default = "auth.sqlite"
-[modules.scrypt]
+[modules.postgres]
+version = "0.2.0"
+[modules.postgres.provides."lenso.auth-store"]
 version = "0.1.0"
+[modules.postgres.options.connection]
+prompt = "PostgreSQL connection environment variable"
+kind = { type = "environment" }
+default = { env = "DATABASE_URL" }
+[modules.scrypt]
+version = "0.2.0"
 [modules.scrypt.provides."lenso.password-hasher"]
 version = "0.1.0"
 [resources]
 auth = [{ path = "typescript/src/modules/auth/core.ts", target = "core.ts" }, { path = "typescript/src/modules/auth/contracts.ts", target = "contracts.ts" }]
 sqlite = [{ path = "typescript/src/modules/sqlite/store.ts", target = "store.ts" }, { path = "typescript/src/modules/sqlite/schema.ts", target = "schema.ts" }]
+postgres = [{ path = "typescript/src/modules/postgres/store.ts", target = "store.ts" }, { path = "typescript/src/modules/postgres/schema.ts", target = "schema.ts" }]
 scrypt = [{ path = "typescript/src/modules/scrypt/hasher.ts", target = "hasher.ts" }]
 [generator]
 schema_version = 1
@@ -36,9 +45,15 @@ directory = "generated/auth"
 files = [{scope="composition", template="templates/typescript/assembly.ts.j2", target="index.ts"}]
 [samples.default]
 instances = { auth = "auth" }
+bindings = { "auth.store" = { type="module", module="sqlite" } }
 context = {language="typescript", runtime="node26"}
 [samples.multiple]
 instances = { customer = "auth", staff = "auth" }
+bindings = { "customer.store" = { type="module", module="sqlite" }, "staff.store" = { type="module", module="sqlite" } }
+context = {language="typescript", runtime="node26"}
+[samples.postgres]
+instances = { auth = "auth" }
+bindings = { "auth.store" = { type="module", module="postgres" } }
 context = {language="typescript", runtime="node26"}
 
 [[generator.dependencies]]
@@ -54,6 +69,20 @@ package="zod"
 version="^4"
 module="auth"
 options={}
+
+[[generator.dependencies]]
+ecosystem="npm"
+package="pg"
+version="^8.16"
+module="postgres"
+options={}
+
+[[generator.dependencies]]
+ecosystem="npm"
+package="@types/pg"
+version="^8.15"
+module="postgres"
+options={section="devDependencies"}
 
 [[generator.dependencies]]
 ecosystem="npm"

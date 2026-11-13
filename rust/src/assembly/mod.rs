@@ -3,6 +3,8 @@
 pub mod auth;
 #[path = "../modules/scrypt/mod.rs"]
 pub mod passwords;
+#[path = "../modules/postgres/mod.rs"]
+pub mod postgres;
 #[path = "../modules/sqlite/mod.rs"]
 pub mod sqlite;
 use auth::{Actions, Auth};
