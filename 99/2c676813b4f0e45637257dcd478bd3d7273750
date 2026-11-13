@@ -1,0 +1,33 @@
+README.md
+  s_c5695907fe744f::t_d8cb4c726f00f1 16
+  s_c5695907fe744f::t_eb2e50686dd788 17,20-23,26-31,33-37
+  s_c5695907fe744f::t_5ae7c9e0a2dd0f 40-60
+tests/consumers/typescript.ts
+  s_c5695907fe744f::t_7b6084e480f6a7 1-12
+lenso.modules.toml
+  s_c5695907fe744f::t_b789fb5bb1bb8a 1-20
+tests/consumers/rust.rs
+  s_c5695907fe744f::t_7b6084e480f6a7 1-15
+scripts/verify-module-cli.py
+  s_c5695907fe744f::t_1ecd750e2ff961 1-21,23-72
+  s_c5695907fe744f::t_d8cb4c726f00f1 22
+  s_c5695907fe744f::t_f39988b8647074 73-78
+.github/workflows/verify-module-install.yml
+  s_c5695907fe744f::t_0b743f3cb1342b 1-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "992c676813b4f0e45637257dcd478bd3d7273750",
+  "prompts": {},
+  "sessions": {
+    "s_c5695907fe744f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1d06d-149b-7062-aa67-3c0145df9d90",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "LioRael <leo@lenso.dev>"
+    }
+  }
+}
