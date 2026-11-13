@@ -4,6 +4,7 @@ import json
 root=Path(__file__).resolve().parent.parent
 for lang in ('typescript','rust'):
     ext='ts' if lang=='typescript' else 'rs'
+    runtime='node26' if lang=='typescript' else 'tokio'
     prefix='typescript/src' if lang=='typescript' else 'rust/src'
     modules={'auth':['core.ts','contracts.ts'] if lang=='typescript' else ['mod.rs'],
              'sqlite':['store.ts','schema.ts'] if lang=='typescript' else ['mod.rs','schema.sql'],
@@ -13,6 +14,7 @@ for lang in ('typescript','rust'):
 version = "0.1.0"
 [modules.auth.supports]
 language = ["{lang}"]
+runtime = ["{runtime}"]
 [modules.auth.options.ttl_ms]
 prompt = "Session lifetime in milliseconds"
 kind = {{ type = "integer", min = 60000, max = 2592000000 }}
@@ -45,10 +47,10 @@ directory = "generated/auth"
 files = [{{scope="composition", template="templates/{lang}/assembly.{ext}.j2", target="{'index.ts' if lang=='typescript' else 'mod.rs'}"}}]
 [samples.default]
 instances = {{ auth = "auth" }}
-context = {{language="{lang}"}}
+context = {{language="{lang}", runtime="{runtime}"}}
 [samples.multiple]
 instances = {{ customer = "auth", staff = "auth" }}
-context = {{language="{lang}"}}
+context = {{language="{lang}", runtime="{runtime}"}}
 '''
     deps= [('npm','@lenso/app','0.1.1','auth',{}),('npm','zod','^4','auth',{}),('npm','@types/node','^26','auth',{'section':'devDependencies'}),('npm','typescript','^6','auth',{'section':'devDependencies'})] if lang=='typescript' else [
       ('cargo','lenso-app','0.1.1','auth',{'features':['json']}),('cargo','serde','1','auth',{'features':['derive']}),('cargo','sha2','0.10','auth',{}),('cargo','getrandom','0.3','auth',{}),('cargo','rusqlite','0.42','sqlite',{'features':['bundled']}),('cargo','tokio','1','sqlite',{'features':['rt','sync']}),('cargo','tokio','1','scrypt',{'features':['rt','sync']}),('cargo','scrypt','0.11','scrypt',{}),('cargo','subtle','2','scrypt',{})]

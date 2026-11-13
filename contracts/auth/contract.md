@@ -1,7 +1,7 @@
 # Auth 0.1 contract
 
 Auth is a native SDK module family. Its initial implementations are TypeScript on
-Node.js 26 and Rust 1.99. Both consume published App SDK 0.1.1; neither depends on a
+Node.js 26 and Rust 1.99 with Tokio. Both consume published App SDK 0.1.1; neither depends on a
 CLI process at application runtime. SQLite and scrypt are the first adapters.
 
 ## Operations

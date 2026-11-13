@@ -3,6 +3,7 @@ schema_version = 1
 version = "0.1.0"
 [modules.auth.supports]
 language = ["typescript"]
+runtime = ["node26"]
 [modules.auth.options.ttl_ms]
 prompt = "Session lifetime in milliseconds"
 kind = { type = "integer", min = 60000, max = 2592000000 }
@@ -35,10 +36,10 @@ directory = "generated/auth"
 files = [{scope="composition", template="templates/typescript/assembly.ts.j2", target="index.ts"}]
 [samples.default]
 instances = { auth = "auth" }
-context = {language="typescript"}
+context = {language="typescript", runtime="node26"}
 [samples.multiple]
 instances = { customer = "auth", staff = "auth" }
-context = {language="typescript"}
+context = {language="typescript", runtime="node26"}
 
 [[generator.dependencies]]
 ecosystem="npm"

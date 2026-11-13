@@ -12,14 +12,15 @@ async function start(t,language,db,migrate=true){
  if(migrate)args.push('--migrate');
  const child=spawn(command,args,{cwd:root,env:{PATH:process.env.PATH,PORT:'0',LENSO_AUTH_DB:db},stdio:['ignore','pipe','pipe']});
  let errors='';child.stderr.on('data',b=>errors+=b);
- t.after(async()=>{if(child.exitCode===null){child.kill('SIGTERM');await new Promise(r=>child.once('exit',r));}});
+ const stop=async()=>{if(child.exitCode!==null || child.signalCode!==null)return;await new Promise(resolve=>{child.once('exit',resolve);child.kill('SIGTERM');});};
+ t.after(stop);
  const port=await new Promise((ok,fail)=>{const timer=setTimeout(()=>{child.kill('SIGKILL');fail(new Error('Server startup timeout: '+errors));},15000);child.on('exit',c=>{clearTimeout(timer);fail(new Error('Server exited '+c+': '+errors));});child.stdout.on('data',b=>{const m=/LISTENING (\d+)/.exec(String(b));if(m){clearTimeout(timer);ok(Number(m[1]));}});});
  const call=async(method,path,body,token)=>{
   const headers={};if(body!==undefined)headers['Content-Type']='application/json';if(token)headers.Authorization='Bearer '+token;
   const response=await fetch(`http://127.0.0.1:${port}${path}`,{method,headers,body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(30000)});
   return {status:response.status,body:await response.json(),cache:response.headers.get('cache-control')};
  };
- return {call,child,port};
+ return {call,child,port,stop};
 }
 for(const language of ['typescript','rust'])test(language+' HTTP lifecycle, authorization and body limits',{timeout:180000},async t=>{
  const dir=mkdtempSync(join(tmpdir(),'lenso-auth-http-'));t.after(()=>rmSync(dir,{recursive:true,force:true}));
@@ -42,4 +43,7 @@ test('TS/Rust reopen the same SQLite accounts and sessions and enforce concurren
  const fromTS=await ts.call('POST','/auth/login',credential);assert.equal(fromTS.status,200);assert.equal((await rust.call('GET','/auth/session',undefined,fromTS.body.token)).status,200);
  assert.equal((await rust.call('POST','/auth/logout',undefined,fromTS.body.token)).status,200);assert.equal((await ts.call('GET','/auth/session',undefined,fromTS.body.token)).status,401);
  const fromRust=await rust.call('POST','/auth/login',credential);assert.equal(fromRust.status,200);assert.equal((await ts.call('GET','/auth/session',undefined,fromRust.body.token)).status,200);
+ await rust.stop();await ts.stop();
+ const restarted=await start(t,'rust',db,false);assert.equal((await restarted.call('GET','/auth/session',undefined,fromRust.body.token)).status,200);
+ assert.equal((await restarted.call('POST','/auth/logout',undefined,fromRust.body.token)).status,200);
 });

@@ -3,6 +3,7 @@ schema_version = 1
 version = "0.1.0"
 [modules.auth.supports]
 language = ["rust"]
+runtime = ["tokio"]
 [modules.auth.options.ttl_ms]
 prompt = "Session lifetime in milliseconds"
 kind = { type = "integer", min = 60000, max = 2592000000 }
@@ -35,10 +36,10 @@ directory = "generated/auth"
 files = [{scope="composition", template="templates/rust/assembly.rs.j2", target="mod.rs"}]
 [samples.default]
 instances = { auth = "auth" }
-context = {language="rust"}
+context = {language="rust", runtime="tokio"}
 [samples.multiple]
 instances = { customer = "auth", staff = "auth" }
-context = {language="rust"}
+context = {language="rust", runtime="tokio"}
 
 [[generator.dependencies]]
 ecosystem="cargo"
