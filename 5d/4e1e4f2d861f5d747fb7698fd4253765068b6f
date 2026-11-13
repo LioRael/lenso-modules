@@ -1,0 +1,43 @@
+auth.typescript.toml
+  s_c5695907fe744f::t_f566f7e3fac9b1 3,18,26,34
+auth.rust.toml
+  s_c5695907fe744f::t_f566f7e3fac9b1 3,18,26,34
+scripts/verify-module-cli.py
+  s_c5695907fe744f::t_f566f7e3fac9b1 81,97,183-184,186-187
+  s_c5695907fe744f::t_af675fffd53670 40
+auth.rust.app.toml
+  s_c5695907fe744f::t_f566f7e3fac9b1 1-166
+lenso.modules.toml
+  s_c5695907fe744f::t_f566f7e3fac9b1 35-60
+scripts/catalogs.py
+  s_c5695907fe744f::t_f566f7e3fac9b1 16,31,39,47,87-105
+  s_c5695907fe744f::t_07db5a5a2e5010 4
+auth.typescript.app.toml
+  s_c5695907fe744f::t_f566f7e3fac9b1 1-96
+templates/typescript/host.ts.j2
+  s_c5695907fe744f::t_f566f7e3fac9b1 1-31,33-35
+  s_c5695907fe744f::t_112dc435f0edef 32
+templates/rust/host.rs.j2
+  s_c5695907fe744f::t_f566f7e3fac9b1 1-9,11-160,165-166
+  s_c5695907fe744f::t_8ca67d7c07dd80 10,161-164
+.github/workflows/verify-module-install.yml
+  s_c5695907fe744f::t_a9cdd31a08719a 16-20,34-39,48-60,63,67-74,76-77,80-83
+README.md
+  s_c5695907fe744f::t_d55bc1bf659087 4,14-41,44,210
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5d4e1e4f2d861f5d747fb7698fd4253765068b6f",
+  "prompts": {},
+  "sessions": {
+    "s_c5695907fe744f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1d06d-149b-7062-aa67-3c0145df9d90",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "LioRael <leo@lenso.dev>"
+    }
+  }
+}
