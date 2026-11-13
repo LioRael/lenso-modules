@@ -1,0 +1,10 @@
+import { authModule } from "../modules/auth/core.js";
+import { SqliteAuthStore } from "../modules/sqlite/store.js";
+import { ScryptHasher } from "../modules/scrypt/hasher.js";
+{% for id in resolution.order %}{% set item = resolution.instances[id] %}{% if item.module == "auth" %}
+export function {{ id|symbol }}(filename = {{ resolution.instances[item.bindings.store].configuration.path|tojson }}, now = Date.now) {
+  const store = new SqliteAuthStore(filename, {{ id|tojson }});
+  const auth = authModule({ store, passwords: new ScryptHasher(), now, sessionTtlMs: {{ item.configuration.ttl_ms }} }, {{ id|tojson }});
+  return { ...auth, store };
+}
+{% endif %}{% endfor %}

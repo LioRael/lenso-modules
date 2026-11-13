@@ -1,0 +1,28 @@
+name: Verify official Auth installation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  install:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - uses: dtolnay/rust-toolchain@1.99.0
+      - name: Install published CLI
+        run: |
+          curl -fsSL --retry 2 https://github.com/LioRael/lenso-cli/releases/download/v1.0.0/install.sh -o "$RUNNER_TEMP/install.sh"
+          sh "$RUNNER_TEMP/install.sh" --prefix "$RUNNER_TEMP/lenso-bin"
+      - name: Generate and run both native language variants
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 scripts/verify-cli.py --binary "$RUNNER_TEMP/lenso-bin/lenso" --official --token-env GITHUB_TOKEN --out "$RUNNER_TEMP/auth-consumers"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: auth-generated-consumers
+          path: ${{ runner.temp }}/auth-consumers/verification.json
+          if-no-files-found: error

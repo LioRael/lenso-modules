@@ -1,0 +1,104 @@
+schema_version = 1
+[modules.auth]
+version = "0.1.0"
+[modules.auth.supports]
+language = ["rust"]
+[modules.auth.options.ttl_ms]
+prompt = "Session lifetime in milliseconds"
+kind = { type = "integer", min = 60000, max = 2592000000 }
+default = 86400000
+[modules.auth.slots.store]
+contract = "lenso.auth-store"
+version = "^0.1"
+[modules.auth.slots.passwords]
+contract = "lenso.password-hasher"
+version = "^0.1"
+[modules.sqlite]
+version = "0.1.0"
+[modules.sqlite.provides."lenso.auth-store"]
+version = "0.1.0"
+[modules.sqlite.options.path]
+prompt = "SQLite database path"
+kind = { type = "text" }
+default = "auth.sqlite"
+[modules.scrypt]
+version = "0.1.0"
+[modules.scrypt.provides."lenso.password-hasher"]
+version = "0.1.0"
+[resources]
+auth = [{ path = "rust/src/modules/auth/mod.rs", target = "mod.rs" }]
+sqlite = [{ path = "rust/src/modules/sqlite/mod.rs", target = "mod.rs" }, { path = "rust/src/modules/sqlite/schema.sql", target = "schema.sql" }]
+scrypt = [{ path = "rust/src/modules/scrypt/mod.rs", target = "mod.rs" }]
+[generator]
+schema_version = 1
+directory = "generated/auth"
+files = [{scope="composition", template="templates/rust/assembly.rs.j2", target="mod.rs"}]
+[samples.default]
+instances = { auth = "auth" }
+context = {language="rust"}
+[samples.multiple]
+instances = { customer = "auth", staff = "auth" }
+context = {language="rust"}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="lenso-app"
+version="0.1.1"
+module="auth"
+options={features=["json"]}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="serde"
+version="1"
+module="auth"
+options={features=["derive"]}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="sha2"
+version="0.10"
+module="auth"
+options={}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="getrandom"
+version="0.3"
+module="auth"
+options={}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="rusqlite"
+version="0.42"
+module="sqlite"
+options={features=["bundled"]}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="tokio"
+version="1"
+module="sqlite"
+options={features=["rt", "sync"]}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="tokio"
+version="1"
+module="scrypt"
+options={features=["rt", "sync"]}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="scrypt"
+version="0.11"
+module="scrypt"
+options={}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="subtle"
+version="2"
+module="scrypt"
+options={}

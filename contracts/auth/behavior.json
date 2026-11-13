@@ -1,0 +1,32 @@
+{
+  "valid": [
+    {
+      "name": "Alice_One",
+      "password": "correct horse battery"
+    },
+    {
+      "name": "user-2",
+      "password": "十二个字节以上密码"
+    }
+  ],
+  "invalid": [
+    {
+      "name": "ab",
+      "password": "correct horse battery"
+    },
+    {
+      "name": "invalid name",
+      "password": "correct horse battery"
+    },
+    {
+      "name": "valid",
+      "password": "short"
+    },
+    {
+      "name": "valid",
+      "password": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    }
+  ],
+  "sessionTtlMs": 60000,
+  "clockMs": 1700000000000
+}

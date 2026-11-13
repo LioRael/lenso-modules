@@ -1,0 +1,18 @@
+#[path="../modules/auth/mod.rs"]
+pub mod auth;
+#[path="../modules/sqlite/mod.rs"]
+pub mod sqlite;
+#[path="../modules/scrypt/mod.rs"]
+pub mod passwords;
+use lenso_app::ActionError;
+use std::path::Path;
+use auth::{Actions,Auth};
+use sqlite::SqliteAuthStore;
+use passwords::ScryptHasher;
+pub struct AuthApplication {pub resources:Auth<SqliteAuthStore,ScryptHasher>,pub actions:Actions,pub store:SqliteAuthStore}
+{% for id in resolution.order %}{% set item = resolution.instances[id] %}{% if item.module == "auth" %}
+pub fn {{ id|symbol }}(filename: Option<&Path>)->Result<AuthApplication,ActionError>{
+    let store=SqliteAuthStore::open(filename.unwrap_or_else(||Path::new({{ resolution.instances[item.bindings.store].configuration.path|rust_string }})),{{ id|rust_string }})?;
+    Ok(AuthApplication{resources:Auth::new(store.clone(),ScryptHasher::default(),{{ item.configuration.ttl_ms }})?,actions:Actions::new({{ id|rust_string }})?,store})
+}
+{% endif %}{% endfor %}

@@ -1,0 +1,19 @@
+{
+  "name": "lenso-modules",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "typescript"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace @lenso-modules/auth-source",
+    "test": "npm run build && node --test typescript/tests/*.test.mjs",
+    "lint": "oxlint --deny-warnings typescript/src",
+    "test:integration": "node --test tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.0",
+    "@types/node": "^26.0.0",
+    "oxlint": "^1.0.0"
+  }
+}

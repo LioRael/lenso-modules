@@ -1,0 +1,14 @@
+{
+  "name": "@lenso-modules/auth-source",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "@lenso/app": "0.1.1",
+    "zod": "^4.0.0"
+  }
+}
