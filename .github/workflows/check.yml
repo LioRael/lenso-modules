@@ -39,3 +39,32 @@ jobs:
       - run: npm ci && npm run build
       - run: cargo build --locked --release --manifest-path rust/Cargo.toml --bin auth-server
       - run: npm run test:integration
+
+  postgres:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        postgres: ['16', '18']
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres }}
+        env:
+          POSTGRES_USER: lenso
+          POSTGRES_PASSWORD: test-only-password
+          POSTGRES_DB: auth_test
+        ports: ['5432/tcp']
+        options: >-
+          --health-cmd "pg_isready -U lenso -d auth_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      AUTH_POSTGRES_URL: postgresql://lenso:test-only-password@127.0.0.1:${{ job.services.postgres.ports[5432] }}/auth_test?sslmode=disable
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+          cache: npm
+      - uses: dtolnay/rust-toolchain@1.99.0
+      - run: npm ci
+      - run: npm run test:postgres:typescript
+      - run: cargo test --locked --release --manifest-path rust/Cargo.toml --test postgres -- --ignored

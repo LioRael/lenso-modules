@@ -1,8 +1,8 @@
-# Auth 0.1 contract
+# Auth 0.2 contract
 
 Auth is a native SDK module family. Its initial implementations are TypeScript on
 Node.js 26 and Rust 1.99 with Tokio. Both consume published App SDK 0.1.1; neither depends on a
-CLI process at application runtime. SQLite and scrypt are the first adapters.
+CLI process at application runtime. SQLite/PostgreSQL implement the same AuthStore contract; scrypt implements PasswordHasher.
 
 ## Operations
 
@@ -41,6 +41,20 @@ it does not overwrite application `PRAGMA user_version`. A newer recorded schema
 is rejected. Migration is transactional and idempotent; no database files or
 application records are deleted by module removal or Code generation.
 
+The PostgreSQL adapter uses parameterized queries, the same realm-scoped keys and
+module-prefixed ledger/tables, and BIGINT millisecond expiry. Explicit migration is
+transactional and serialized by advisory transaction lock `(1818586739,1635087464)`
+across both language implementations. It is safe to repeat or race migration calls;
+a newer recorded schema rejects the transaction without deleting records. There is
+no automatic SQLite/PostgreSQL data conversion. Pool/connection owners release
+native resources; Rust retains its driver until the final store clone drops.
+
+Connection values are runtime-only. Catalog configuration records an environment
+reference; generated Rust uses native TLS certificate validation and TypeScript
+uses node-postgres TLS configuration. Production connections should require TLS
+and suitable native trust configuration. Local disposable tests explicitly disable
+TLS. Tested database versions are PostgreSQL 16 and 18.
+
 Scrypt format 1 uses `N=32768,r=8,p=3`, 16 random salt bytes represented as hex text,
 and a 64-byte result. Both implementations use the UTF-8 bytes of that salt text.
 The versioned encoding pins these parameters; malformed/unknown parameter profiles
@@ -64,7 +78,7 @@ the integrating application.
 
 This is an initial password/session module, not a complete production identity
 provider. Email verification, recovery, MFA, OAuth/OIDC, disabled-account policy,
-roles, Redis, PostgreSQL and automated database/data conversion are not implemented.
+roles, Redis and automated database/data conversion are not implemented.
 SDK cancellation and an interrupted response do not imply rollback of a committed
 registration or session operation.
 

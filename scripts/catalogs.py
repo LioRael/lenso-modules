@@ -8,10 +8,11 @@ for lang in ('typescript','rust'):
     prefix='typescript/src' if lang=='typescript' else 'rust/src'
     modules={'auth':['core.ts','contracts.ts'] if lang=='typescript' else ['mod.rs'],
              'sqlite':['store.ts','schema.ts'] if lang=='typescript' else ['mod.rs','schema.sql'],
+             'postgres':['store.ts','schema.ts'] if lang=='typescript' else ['mod.rs','schema.sql'],
              'scrypt':['hasher.ts'] if lang=='typescript' else ['mod.rs']}
     body=f'''schema_version = 1
 [modules.auth]
-version = "0.1.0"
+version = "0.2.0"
 [modules.auth.supports]
 language = ["{lang}"]
 runtime = ["{runtime}"]
@@ -26,15 +27,23 @@ version = "^0.1"
 contract = "lenso.password-hasher"
 version = "^0.1"
 [modules.sqlite]
-version = "0.1.0"
+version = "0.2.0"
 [modules.sqlite.provides."lenso.auth-store"]
 version = "0.1.0"
 [modules.sqlite.options.path]
 prompt = "SQLite database path"
 kind = {{ type = "text" }}
 default = "auth.sqlite"
-[modules.scrypt]
+[modules.postgres]
+version = "0.2.0"
+[modules.postgres.provides."lenso.auth-store"]
 version = "0.1.0"
+[modules.postgres.options.connection]
+prompt = "PostgreSQL connection environment variable"
+kind = {{ type = "environment" }}
+default = {{ env = "DATABASE_URL" }}
+[modules.scrypt]
+version = "0.2.0"
 [modules.scrypt.provides."lenso.password-hasher"]
 version = "0.1.0"
 [resources]
@@ -47,13 +56,20 @@ directory = "generated/auth"
 files = [{{scope="composition", template="templates/{lang}/assembly.{ext}.j2", target="{'index.ts' if lang=='typescript' else 'mod.rs'}"}}]
 [samples.default]
 instances = {{ auth = "auth" }}
+bindings = {{ "auth.store" = {{ type="module", module="sqlite" }} }}
 context = {{language="{lang}", runtime="{runtime}"}}
 [samples.multiple]
 instances = {{ customer = "auth", staff = "auth" }}
+bindings = {{ "customer.store" = {{ type="module", module="sqlite" }}, "staff.store" = {{ type="module", module="sqlite" }} }}
 context = {{language="{lang}", runtime="{runtime}"}}
 '''
-    deps= [('npm','@lenso/app','0.1.1','auth',{}),('npm','zod','^4','auth',{}),('npm','@types/node','^26','auth',{'section':'devDependencies'}),('npm','typescript','^6','auth',{'section':'devDependencies'})] if lang=='typescript' else [
-      ('cargo','lenso-app','0.1.1','auth',{'features':['json']}),('cargo','serde','1','auth',{'features':['derive']}),('cargo','sha2','0.10','auth',{}),('cargo','getrandom','0.3','auth',{}),('cargo','rusqlite','0.42','sqlite',{'features':['bundled']}),('cargo','tokio','1','sqlite',{'features':['rt','sync']}),('cargo','tokio','1','scrypt',{'features':['rt','sync']}),('cargo','scrypt','0.11','scrypt',{}),('cargo','subtle','2','scrypt',{})]
+    body+=f'''[samples.postgres]
+instances = {{{{ auth = "auth" }}}}
+bindings = {{{{ "auth.store" = {{{{ type="module", module="postgres" }}}} }}}}
+context = {{{{language="{lang}", runtime="{runtime}"}}}}
+'''.replace('{{','{').replace('}}','}')
+    deps= [('npm','@lenso/app','0.1.1','auth',{}),('npm','zod','^4','auth',{}),('npm','pg','^8.16','postgres',{}),('npm','@types/pg','^8.15','postgres',{'section':'devDependencies'}),('npm','@types/node','^26','auth',{'section':'devDependencies'}),('npm','typescript','^6','auth',{'section':'devDependencies'})] if lang=='typescript' else [
+      ('cargo','lenso-app','0.1.1','auth',{'features':['json']}),('cargo','serde','1','auth',{'features':['derive']}),('cargo','sha2','0.10','auth',{}),('cargo','getrandom','0.3','auth',{}),('cargo','rusqlite','0.42','sqlite',{'features':['bundled']}),('cargo','tokio','1','sqlite',{'features':['rt','sync']}),('cargo','tokio','1','scrypt',{'features':['rt','sync']}),('cargo','scrypt','0.11','scrypt',{}),('cargo','subtle','2','scrypt',{}),('cargo','tokio-postgres','0.7','postgres',{}),('cargo','postgres-native-tls','0.5','postgres',{}),('cargo','native-tls','0.2','postgres',{}),('cargo','tokio','1','postgres',{'features':['rt','sync','net','time']})]
     def literal(v):
       if isinstance(v,dict):return '{'+', '.join(k+'='+literal(x) for k,x in v.items())+'}'
       return json.dumps(v)
@@ -63,3 +79,7 @@ context = {{language="{lang}", runtime="{runtime}"}}
 schema=(root/'contracts/auth/sqlite-v1.sql').read_text()
 (root/'typescript/src/modules/sqlite/schema.ts').write_text('export const schema = '+json.dumps(schema)+';\n')
 (root/'rust/src/modules/sqlite/schema.sql').write_text(schema)
+
+schema=(root/'contracts/auth/postgres-v1.sql').read_text()
+(root/'typescript/src/modules/postgres/schema.ts').write_text('export const schema = '+json.dumps(schema)+';\n')
+(root/'rust/src/modules/postgres/schema.sql').write_text(schema)

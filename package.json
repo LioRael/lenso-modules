@@ -9,7 +9,8 @@
     "build": "npm run build --workspace @lenso-modules/auth-source",
     "test": "npm run build && node --test typescript/tests/*.test.mjs",
     "lint": "oxlint --deny-warnings typescript/src",
-    "test:integration": "node --test tests/*.test.mjs"
+    "test:integration": "node --test tests/*.test.mjs",
+    "test:postgres:typescript": "npm run build && node --test tests/postgres-native.mjs"
   },
   "devDependencies": {
     "typescript": "^6.0.0",

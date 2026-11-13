@@ -1,9 +1,21 @@
+{% set stores = namespace(sqlite=false, postgres=false) %}{% for id in resolution.order %}{% set item = resolution.instances[id] %}{% if item.module == "sqlite" %}{% set stores.sqlite = true %}{% elif item.module == "postgres" %}{% set stores.postgres = true %}{% endif %}{% endfor %}
 import { authModule } from "../modules/auth/core.js";
-import { SqliteAuthStore } from "../modules/sqlite/store.js";
+{% if stores.sqlite %}import { SqliteAuthStore } from "../modules/sqlite/store.js";{% endif %}
+{% if stores.postgres %}import { PostgresAuthStore } from "../modules/postgres/store.js";
+function connectionUrl(name: string): string {
+  const value = process.env[name];
+  if (!value) throw new Error(`Missing PostgreSQL connection environment variable: ${name}`);
+  return value;
+}{% endif %}
 import { ScryptHasher } from "../modules/scrypt/hasher.js";
-{% for id in resolution.order %}{% set item = resolution.instances[id] %}{% if item.module == "auth" %}
-export function {{ id|symbol }}(filename = {{ resolution.instances[item.bindings.store].configuration.path|tojson }}, now = Date.now) {
+{% for id in resolution.order %}{% set item = resolution.instances[id] %}{% if item.module == "auth" %}{% set provider = resolution.instances[item.bindings.store] %}
+{% if provider.module == "postgres" %}
+export function {{ id|symbol }}(url = connectionUrl({{ provider.configuration.connection.env|tojson }}), now = Date.now) {
+  const store = new PostgresAuthStore({ connectionString: url }, {{ id|tojson }});
+{% else %}
+export function {{ id|symbol }}(filename = {{ provider.configuration.path|tojson }}, now = Date.now) {
   const store = new SqliteAuthStore(filename, {{ id|tojson }});
+{% endif %}
   const auth = authModule({ store, passwords: new ScryptHasher(), now, sessionTtlMs: {{ item.configuration.ttl_ms }} }, {{ id|tojson }});
   return { ...auth, store };
 }

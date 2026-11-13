@@ -1,18 +1,29 @@
+{% set stores = namespace(sqlite=false, postgres=false) %}{% for id in resolution.order %}{% set item = resolution.instances[id] %}{% if item.module == "sqlite" %}{% set stores.sqlite = true %}{% elif item.module == "postgres" %}{% set stores.postgres = true %}{% endif %}{% endfor %}
 #[path="../modules/auth/mod.rs"]
 pub mod auth;
-#[path="../modules/sqlite/mod.rs"]
+{% if stores.sqlite %}#[path="../modules/sqlite/mod.rs"]
 pub mod sqlite;
-#[path="../modules/scrypt/mod.rs"]
+use std::path::Path;
+use sqlite::SqliteAuthStore;
+{% endif %}{% if stores.postgres %}#[path="../modules/postgres/mod.rs"]
+pub mod postgres;
+use postgres::PostgresAuthStore;
+{% endif %}#[path="../modules/scrypt/mod.rs"]
 pub mod passwords;
 use lenso_app::ActionError;
-use std::path::Path;
 use auth::{Actions,Auth};
-use sqlite::SqliteAuthStore;
 use passwords::ScryptHasher;
-pub struct AuthApplication {pub resources:Auth<SqliteAuthStore,ScryptHasher>,pub actions:Actions,pub store:SqliteAuthStore}
-{% for id in resolution.order %}{% set item = resolution.instances[id] %}{% if item.module == "auth" %}
-pub fn {{ id|symbol }}(filename: Option<&Path>)->Result<AuthApplication,ActionError>{
-    let store=SqliteAuthStore::open(filename.unwrap_or_else(||Path::new({{ resolution.instances[item.bindings.store].configuration.path|rust_string }})),{{ id|rust_string }})?;
+pub struct AuthApplication<S = {% if stores.sqlite %}SqliteAuthStore{% else %}PostgresAuthStore{% endif %}> {pub resources:Auth<S,ScryptHasher>,pub actions:Actions,pub store:S}
+{% for id in resolution.order %}{% set item = resolution.instances[id] %}{% if item.module == "auth" %}{% set provider = resolution.instances[item.bindings.store] %}
+{% if provider.module == "postgres" %}
+pub async fn {{ id|symbol }}(url: Option<&str>)->Result<AuthApplication<PostgresAuthStore>,ActionError>{
+    let configured;
+    let url=match url { Some(url)=>url, None=>{configured=std::env::var({{ provider.configuration.connection.env|rust_string }}).map_err(|_|ActionError::new(lenso_app::ErrorCode::InvalidInput,"Missing PostgreSQL connection environment variable"))?;&configured} };
+    let store=PostgresAuthStore::connect(url,{{ id|rust_string }}).await?;
+{% else %}
+pub fn {{ id|symbol }}(filename: Option<&Path>)->Result<AuthApplication<SqliteAuthStore>,ActionError>{
+    let store=SqliteAuthStore::open(filename.unwrap_or_else(||Path::new({{ provider.configuration.path|rust_string }})),{{ id|rust_string }})?;
+{% endif %}
     Ok(AuthApplication{resources:Auth::new(store.clone(),ScryptHasher::default(),{{ item.configuration.ttl_ms }})?,actions:Actions::new({{ id|rust_string }})?,store})
 }
 {% endif %}{% endfor %}

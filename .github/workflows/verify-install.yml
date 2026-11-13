@@ -7,11 +7,23 @@ jobs:
   install:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: lenso
+          POSTGRES_PASSWORD: test-only-password
+          POSTGRES_DB: auth_consumers
+        ports: ['5432/tcp']
+        options: >-
+          --health-cmd "pg_isready -U lenso -d auth_consumers"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: '26'
+      - run: npm ci
       - uses: dtolnay/rust-toolchain@1.99.0
       - name: Install published CLI
         run: |
@@ -19,8 +31,9 @@ jobs:
           sh "$RUNNER_TEMP/install.sh" --prefix "$RUNNER_TEMP/lenso-bin"
       - name: Generate and run both native language variants
         env:
+          DATABASE_URL: postgresql://lenso:test-only-password@127.0.0.1:${{ job.services.postgres.ports[5432] }}/auth_consumers?sslmode=disable
           GITHUB_TOKEN: ${{ github.token }}
-        run: python3 scripts/verify-cli.py --binary "$RUNNER_TEMP/lenso-bin/lenso" --official --token-env GITHUB_TOKEN --out "$RUNNER_TEMP/auth-consumers"
+        run: python3 scripts/verify-cli.py --binary "$RUNNER_TEMP/lenso-bin/lenso" --official --storage both --token-env GITHUB_TOKEN --out "$RUNNER_TEMP/auth-consumers"
       - uses: actions/upload-artifact@v7
         with:
           name: auth-generated-consumers
