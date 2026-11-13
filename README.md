@@ -13,78 +13,51 @@ from npm/crates.io, not workspace path dependencies.
 
 ## Install in a prepared application
 
-Requires published CLI 1.0.0 and Code 0.3.1. The official Auth preset asks for the
-target language; `--yes` never chooses a language for you. Each application target
-has its own root configuration and lock. A monorepo may keep separate TS/Rust
-application targets.
+Requires Code 0.3.2 and a prepared native application. Install the extension once,
+then add functional modules through Code:
 
 ```sh
-lenso init --preset auth
-lenso code validate
-lenso code compose-preview --sample default
-lenso code compose --sample default
+lenso init --preset code
+lenso code search auth
+lenso code preview auth
+lenso code add auth
 ```
 
-The `default` sample explicitly selects SQLite. Select PostgreSQL with
-`lenso code compose-preview --sample postgres`, followed by
-`lenso code compose --sample postgres`. With no saved composition,
-`lenso code compose-preview --input '{"instances":{"auth":"auth"}}'` asks for the
-store provider; `--yes` does not choose one. Agents may supply
-`--input '{"instances":{"auth":"auth"},"bindings":{"auth.store":{"type":"module","module":"postgres"}}}'`.
-The selected provider is recorded in the composition receipt and reused on updates.
+Code owns `lenso.modules.toml`, resolves the pinned Auth release and asks for the
+project language and store provider. Agents pass `--language typescript` (or `rust`)
+and `--input '{"bindings":{"auth.store":{"type":"module","module":"postgres"}}}'`.
+SQLite and PostgreSQL are provider choices, not separate presets. `--yes` does not
+answer language or provider questions. `code preview auth` reviews changes without
+applying them; `code update auth` refreshes the module directory and source pins.
 
-PostgreSQL reads `DATABASE_URL` at application runtime; the CLI stores only the
-environment reference, never its value. Override the reference with configuration
-`{"auth.store":{"connection":{"env":"MY_AUTH_DATABASE_URL"}}}`. Configure TLS in
-the URL or native connection configuration for your deployment. The templates do not add a certificate-verification bypass.
-
-Both adapters require explicit migration before use: `await app.store.migrate()`
-in TypeScript and `app.store.migrate().await?` in Rust. PostgreSQL migrations use a
-transaction and a shared advisory lock across processes and languages, preserve
-records and reject a newer schema. PostgreSQL 16 and 18 are tested in CI.
-
-The generated PostgreSQL Rust factory is async: `i_61757468(None).await?`. Its Tokio
-host needs I/O enabled. SQLite keeps the existing synchronous factory. TypeScript
-factories are synchronous; store operations and PostgreSQL shutdown are async.
-SQLite consumers do not acquire PostgreSQL dependencies or source files.
-
-Switching stores reconciles owned code/dependencies after preview and approval. It
-does **not** transfer or erase database records. The existing database stays intact;
-applications own data conversion and handwritten entry changes. Use the target
-sample, or submit the replacement binding and its configuration explicitly.
-For an existing Auth 0.1 project, preset reapplication updates package constraints
-while retaining installed extension configuration and its source pin. Explicitly
-review the new module source ref before previewing:
-
-```sh
-lenso preset apply auth
-lenso ext configure code --input '{"ref":"v0.2.0"}'
-lenso code compose-preview --refresh --sample postgres
-lenso code compose --sample postgres
-```
-
-The existing language stays selected. Preview does not require a database connection;
-set `DATABASE_URL` when running the generated PostgreSQL application.
-
-For Agents, provide `--input '{"language":"typescript"}'` or
-`--input '{"language":"rust"}'` during initialization, and use the existing JSON /
-answers / approval protocol. Runtime support is Node.js 26 or Tokio on Rust 1.99; selecting
-a language installs its native source, SDK dependencies and factory assembly.
-Existing project dependency conflicts require a choice and are not bypassed by
-`--yes`. Preview and file/command approval precede installation.
+The generated source stays below `src/generated/auth`. Code records target context
+and installed module versions in `src/code.modules.json`, with separate composition
+receipts below `src/code/modules`. Repeated adds reuse the selected language,
+runtime and adapters. Existing resource catalogs, Auth presets and `code compose`
+installations remain supported; the Auth preset is a compatibility entry only.
 
 The target must already contain `package.json` with ESM/TypeScript build settings,
-or `Cargo.toml` with a native Rust entry. The preset installs a module, not a full
-application scaffold. Generated source goes below `src/generated/auth` and its
-receipt is `src/composition.json`. The default sample exports the factory
-`i_61757468`; the `multiple` sample creates independent customer/staff realms.
-Handwritten application entries and business extensions remain user-owned.
+or `Cargo.toml` with a native Rust entry. Runtime support is Node.js 26 or Rust 1.99
+with Tokio. The extension installs editable source and native dependencies; it does
+not scaffold a complete application. Explicit database migration remains an
+application startup operation. PostgreSQL reads `DATABASE_URL` at runtime; the
+composition stores only an environment reference. The generated Rust PostgreSQL
+factory is async and requires a Tokio host with I/O enabled.
 
-Use the generated factory with an explicit database path and explicitly run its
-SQLite migration before serving traffic. Configure SDK Executor/Context from the
-native operation handles. The source host below demonstrates the HTTP integration.
-Language/runtime changes require a new application target; code cleanup is not
-user-data migration.
+Provider switches preserve database data and handwritten application entries.
+Applications own data conversion and entry changes, including synchronous SQLite
+versus async PostgreSQL Rust factory calls. Preview and separate authorization of
+files/native commands still apply. Dependency conflicts require a choice.
+
+### Existing Auth installations
+
+The historical `auth` preset and `code compose` commands remain compatibility
+paths. Existing configured composition catalogs also accept `code add auth`,
+`code preview auth` and `code update auth`, reusing their selected language and
+ownership receipt. Applying the Code preset preserves existing extension settings.
+To review a newer source ref, explicitly run `lenso ext configure code --input
+'{"ref":"v0.2.0"}'` before `code compose-preview --refresh --sample postgres`.
+A fresh Code module directory is the primary entry for new projects.
 
 ## Run the reference hosts from source
 
