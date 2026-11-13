@@ -74,7 +74,7 @@ jobs:
             python3 scripts/verify-module-cli.py --binary "$RUNNER_TEMP/bin/lenso" "${source[@]}" --token-env GITHUB_TOKEN --language "$LANGUAGE" --storage "$storage" --out "$RUNNER_TEMP/consumers/$LANGUAGE-$storage"
           done
           python3 dist/cli-source/scripts/verify-app.py --binary "$RUNNER_TEMP/bin/lenso" \
-            "${app_source[@]}" --language "$LANGUAGE" --storage both --out "$RUNNER_TEMP/apps"
+            "${app_source[@]}" --token-env GITHUB_TOKEN --language "$LANGUAGE" --storage both --out "$RUNNER_TEMP/apps"
       - uses: actions/upload-artifact@v7
         with:
           name: code-module-consumers-${{ matrix.language }}
