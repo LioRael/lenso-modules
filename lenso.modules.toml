@@ -18,3 +18,17 @@ catalog = "auth.typescript.toml"
 language = "rust"
 runtime = "tokio"
 catalog = "auth.rust.toml"
+
+[[modules.auth.releases]]
+version = "0.2.1"
+reference = "v0.2.1"
+
+[[modules.auth.releases.targets]]
+language = "typescript"
+runtime = "node26"
+catalog = "auth.typescript.toml"
+
+[[modules.auth.releases.targets]]
+language = "rust"
+runtime = "tokio"
+catalog = "auth.rust.toml"

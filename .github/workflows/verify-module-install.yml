@@ -1,6 +1,13 @@
 name: Verify Code module installation
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - 'auth.*.toml'
+      - 'lenso.modules.toml'
+      - 'templates/**'
+      - 'scripts/verify-module-cli.py'
+      - '.github/workflows/verify-module-install.yml'
 permissions:
   contents: read
 jobs:
@@ -33,9 +40,12 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           DATABASE_URL: postgresql://lenso:test-only-password@127.0.0.1:${{ job.services.postgres.ports[5432] }}/modules?sslmode=disable
         run: |
+          npm ci
+          local=()
+          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then local=(--local-modules); fi
           for language in typescript rust; do
             for storage in sqlite postgres; do
-              python3 scripts/verify-module-cli.py --binary "$RUNNER_TEMP/bin/lenso" --official --token-env GITHUB_TOKEN --language "$language" --storage "$storage" --out "$RUNNER_TEMP/consumers/$language-$storage"
+              python3 scripts/verify-module-cli.py --binary "$RUNNER_TEMP/bin/lenso" --official "${local[@]}" --token-env GITHUB_TOKEN --language "$language" --storage "$storage" --out "$RUNNER_TEMP/consumers/$language-$storage"
             done
           done
       - uses: actions/upload-artifact@v7

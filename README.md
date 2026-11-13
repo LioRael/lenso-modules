@@ -1,7 +1,7 @@
 # Lenso Modules
 
 Editable functional modules built on the published Lenso SDKs. The first module is
-**Auth 0.2.0**: password registration/login and opaque sessions, with independent
+**Auth 0.2.1**: password registration/login and opaque sessions, with independent
 TypeScript and Rust implementations, SQLite/PostgreSQL stores and a bounded scrypt provider.
 
 This repository owns business interfaces, implementations, adapters, templates and
@@ -13,7 +13,7 @@ from npm/crates.io, not workspace path dependencies.
 
 ## Install in a prepared application
 
-Requires Code 0.3.2 and a prepared native application. Install the extension once,
+Requires Code 0.3.4 and a prepared native application. Install the extension once,
 then add functional modules through Code:
 
 ```sh
@@ -23,18 +23,67 @@ lenso code preview auth
 lenso code add auth
 ```
 
-Code owns `lenso.modules.toml`, resolves the pinned Auth release and asks for the
-project language and store provider. Agents pass `--language typescript` (or `rust`)
-and `--input '{"bindings":{"auth.store":{"type":"module","module":"postgres"}}}'`.
-SQLite and PostgreSQL are provider choices, not separate presets. `--yes` does not
-answer language or provider questions. `code preview auth` reviews changes without
-applying them; `code update auth` refreshes the module directory and source pins.
+Code owns `lenso.modules.toml` and selects a pinned Auth release. Configure the
+project once through commands, then reuse it for previews, adds and updates:
 
-The generated source stays below `src/generated/auth`. Code records target context
-and installed module versions in `src/code.modules.json`, with separate composition
-receipts below `src/code/modules`. Repeated adds reuse the selected language,
-runtime and adapters. Existing resource catalogs, Auth presets and `code compose`
-installations remain supported; the Auth preset is a compatibility entry only.
+```sh
+lenso code config --language typescript --runtime node26
+# For Rust: lenso code config --language rust --runtime tokio
+lenso code config --modules-path src/features --import-alias '#modules'
+lenso code config --provider lenso.auth-store=sqlite
+lenso code preview auth
+lenso code add auth
+```
+
+`lenso.code.toml` records these conventions. JSON/Agent clients can also pass
+`code config --input '{"settings":{...}}'` to set module defaults, for example:
+
+```toml
+[modules.auth.options]
+ttl_ms = 120000
+[modules.sqlite.options]
+path = "auth.sqlite"
+[modules.postgres.options]
+connection = { env = "AUTH_DATABASE_URL" }
+```
+
+Store connection values stay in the application's environment, not the config or
+lock. Project defaults fill missing choices; saved and explicit instance settings
+win. With no configured language or store, Code asks through the existing terminal
+or JSON questions. `--yes` approves plans and never invents these domain choices.
+
+The default output stays below `src/generated/auth`; `paths.modules` moves its
+family root, for example to `src/features/auth`. The generated assembly README
+records the selected store, lifetime, factory call and configured TypeScript import
+alias. The application owns its TypeScript/runtime alias mapping. Module internals
+use relative imports, and Rust needs no TypeScript import alias.
+
+Code stores target context and module versions in `src/code.modules.json` and
+separate composition receipts below `src/code/modules`. Repeated adds and updates
+reuse configuration. `code preview auth` never writes generated files. Use
+`code update auth` to review a newer source release while retaining user edits.
+
+Changing the project provider default does not replace installed storage. Switch
+one installed Auth instance explicitly:
+
+```sh
+lenso code config --provider lenso.auth-store=postgres
+lenso code preview auth --input '{"bindings":{"auth.store":{"type":"module","module":"postgres"}}}'
+lenso code add auth --input '{"bindings":{"auth.store":{"type":"module","module":"postgres"}}}'
+```
+
+Only the replaced provider's old options are reset; Auth TTL and other instance
+settings remain saved. Code applies defaults for the new provider, removes unused
+owned sources/dependencies and asks before changing files or running installation
+commands. Handwritten entries and database data remain application-owned. A Rust
+SQLite-to-PostgreSQL change requires adapting the factory call to async. Data
+migration is a separate application operation.
+
+Language/runtime changes require a new project target. Moving an installed output
+root requires `code preview auth --reconfigure`, followed by an approved
+`code add auth --reconfigure`; handwritten imports are never rewritten for you.
+Existing resource catalogs, Auth presets and `code compose` remain compatibility
+paths; Auth is a functional Code module rather than a primary extension preset.
 
 The target must already contain `package.json` with ESM/TypeScript build settings,
 or `Cargo.toml` with a native Rust entry. Runtime support is Node.js 26 or Rust 1.99
@@ -128,3 +177,13 @@ local Code manifest during extension development. Reports live in the explicit
 
 Packages in this repository are private build/test consumers. Functional source is
 distributed from immutable Git snapshots; it is not an npm/crates.io Auth package.
+
+`scripts/verify-module-cli.py` is the primary module-directory acceptance. It uses
+Code 0.3.4, project language/runtime/path/provider/option defaults, real compilation
+and database actions, then switches storage in both directions without clearing
+Auth settings. It checks denied plans, retained defaults, source/dependency cleanup,
+data preservation, customization-preserving updates and offline replay. Its four
+language/store cases run in `Verify Code module installation`; PRs use the local
+Auth source with the published Code extension, while manual dispatch consumes the
+live official module directory. Use `--local-modules --official` before publishing
+Auth; omit `--local-modules` after the immutable release and directory are live.
