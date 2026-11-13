@@ -56,8 +56,6 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U lenso -d auth_test"
           --health-interval 5s --health-timeout 5s --health-retries 10
-    env:
-      AUTH_POSTGRES_URL: postgresql://lenso:test-only-password@127.0.0.1:${{ job.services.postgres.ports[5432] }}/auth_test?sslmode=disable
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
@@ -66,5 +64,9 @@ jobs:
           cache: npm
       - uses: dtolnay/rust-toolchain@1.99.0
       - run: npm ci
-      - run: npm run test:postgres:typescript
-      - run: cargo test --locked --release --manifest-path rust/Cargo.toml --test postgres -- --ignored
+      - name: Verify both PostgreSQL providers
+        env:
+          AUTH_POSTGRES_URL: postgresql://lenso:test-only-password@127.0.0.1:${{ job.services.postgres.ports[5432] }}/auth_test?sslmode=disable
+        run: |
+          npm run test:postgres:typescript
+          cargo test --locked --release --manifest-path rust/Cargo.toml --test postgres -- --ignored
