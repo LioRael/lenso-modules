@@ -1,0 +1,36 @@
+lenso.modules.toml
+  s_c5695907fe744f::t_da46f8af9d0ee3 21-34
+auth.rust.toml
+  s_c5695907fe744f::t_da46f8af9d0ee3 3,18,26,34,45
+templates/rust/integration.md.j2
+  s_c5695907fe744f::t_da46f8af9d0ee3 1-28
+.github/workflows/verify-module-install.yml
+  s_c5695907fe744f::t_ab883900436545 4-10,43-45,48
+README.md
+  s_c5695907fe744f::t_d006f171d5b828 4,16,26-27,29-86,180-189
+scripts/catalogs.py
+  s_c5695907fe744f::t_da46f8af9d0ee3 15,30,38,46,56
+scripts/verify-module-cli.py
+  s_c5695907fe744f::t_ab883900436545 2-5,7-14,16-34,36-39,41-45,47-79,81-82,84-191
+  s_c5695907fe744f::t_d006f171d5b828 40,80
+templates/typescript/integration.md.j2
+  s_c5695907fe744f::t_da46f8af9d0ee3 1-24
+auth.typescript.toml
+  s_c5695907fe744f::t_da46f8af9d0ee3 3,18,26,34,45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bb8a0e45d5e159dcad49979874bafb4d14b84bc8",
+  "prompts": {},
+  "sessions": {
+    "s_c5695907fe744f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1d06d-149b-7062-aa67-3c0145df9d90",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "LioRael <leo@lenso.dev>"
+    }
+  }
+}
