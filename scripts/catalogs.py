@@ -12,7 +12,7 @@ for lang in ('typescript','rust'):
              'scrypt':['hasher.ts'] if lang=='typescript' else ['mod.rs']}
     body=f'''schema_version = 1
 [modules.auth]
-version = "0.2.0"
+version = "0.2.1"
 [modules.auth.supports]
 language = ["{lang}"]
 runtime = ["{runtime}"]
@@ -27,7 +27,7 @@ version = "^0.1"
 contract = "lenso.password-hasher"
 version = "^0.1"
 [modules.sqlite]
-version = "0.2.0"
+version = "0.2.1"
 [modules.sqlite.provides."lenso.auth-store"]
 version = "0.1.0"
 [modules.sqlite.options.path]
@@ -35,7 +35,7 @@ prompt = "SQLite database path"
 kind = {{ type = "text" }}
 default = "auth.sqlite"
 [modules.postgres]
-version = "0.2.0"
+version = "0.2.1"
 [modules.postgres.provides."lenso.auth-store"]
 version = "0.1.0"
 [modules.postgres.options.connection]
@@ -43,7 +43,7 @@ prompt = "PostgreSQL connection environment variable"
 kind = {{ type = "environment" }}
 default = {{ env = "DATABASE_URL" }}
 [modules.scrypt]
-version = "0.2.0"
+version = "0.2.1"
 [modules.scrypt.provides."lenso.password-hasher"]
 version = "0.1.0"
 [resources]
@@ -53,7 +53,7 @@ version = "0.1.0"
     body+=f'''[generator]
 schema_version = 1
 directory = "generated/auth"
-files = [{{scope="composition", template="templates/{lang}/assembly.{ext}.j2", target="{'index.ts' if lang=='typescript' else 'mod.rs'}"}}]
+files = [{{scope="composition", template="templates/{lang}/assembly.{ext}.j2", target="{'index.ts' if lang=='typescript' else 'mod.rs'}"}}, {{scope="composition", template="templates/{lang}/integration.md.j2", target="README.md"}}]
 [samples.default]
 instances = {{ auth = "auth" }}
 bindings = {{ "auth.store" = {{ type="module", module="sqlite" }} }}

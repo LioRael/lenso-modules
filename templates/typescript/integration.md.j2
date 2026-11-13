@@ -1,0 +1,24 @@
+# Generated Auth integration
+
+{% set base = resolution.context.modules_path|default("src/generated") %}Source: `{{ base }}/auth/assembly/index.ts`.
+{% if resolution.context.import_alias is defined %}Project import: `{{ resolution.context.import_alias }}/auth/assembly/index.js`.
+The application owns the matching TypeScript/runtime alias mapping; internal
+module imports remain relative and work without an alias.
+{% endif %}
+{% for id in resolution.order %}{% set item = resolution.instances[id] %}{% if item.module == "auth" %}{% set store = resolution.instances[item.bindings.store] %}
+## Instance `{{ id }}`
+
+Store: `{{ store.module }}`. Session lifetime: {{ item.configuration.ttl_ms }} ms.
+{% if store.module == "postgres" %}The default connection comes from `{{ store.configuration.connection.env }}` at runtime.
+{% else %}The default SQLite path is `{{ store.configuration.path }}`.
+{% endif %}
+Import `{{ id|symbol }}` from the assembly and call it without arguments to reuse
+these settings. Call `await app.store.migrate()` explicitly at application startup;
+close it with `await app.store.close()` when the application stops.
+{% endif %}{% endfor %}
+
+Preview updates with `lenso code preview auth`. Change a store explicitly with
+`lenso code preview auth --input '{"bindings":{"auth.store":{"type":"module","module":"postgres"}}}'`
+and apply the reviewed plan using `lenso code add auth` with the same input.
+Project provider defaults do not replace an installed store. Switching adapters
+preserves database files and records; applications own data conversion.
