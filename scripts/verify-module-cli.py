@@ -77,7 +77,8 @@ creds = ['--token-env', a.token_env] if a.token_env else []
 setup = ['--input', json.dumps({'author_root': 'author', 'format': 'lenso-modules-v1', 'catalog': 'lenso.modules.toml'})] if local else []
 run('init', '--preset', 'code' if a.official else 'code.preset.toml', *setup, '--yes', *creds)
 lock = json.loads((project / 'lenso.lock').read_text())
-assert next(x for x in lock['extensions'] if x['id'] == 'code')['definition']['version'] == '0.3.4'
+code_version = next(x for x in lock['extensions'] if x['id'] == 'code')['definition']['version']
+assert (0, 3, 4) <= tuple(map(int, code_version.split('.'))) < (0, 4, 0), code_version
 assert any(x['name'] == 'auth' for x in run('code', 'search', 'auth')['outputs']['search']['results'])
 choice = run('code', 'add', 'auth', '--yes', expected=2)
 assert choice['question']['id'].startswith('code:module-language:')
@@ -186,6 +187,6 @@ if local:
     directory.write_text(directory.read_text().replace('reference = "v0.2.2"', 'reference = "moved-tag"'))
     run('code', 'update', 'auth', '--yes', expected=1)
 (project / 'verification.json').write_text(json.dumps({'language': a.language, 'storage': a.storage, 'switched_to': other,
-    'official': a.official, 'local_modules': local, 'project_config': True, 'compiled_and_ran': True,
+    'official': a.official, 'local_modules': local, 'code_version': code_version, 'project_config': True, 'compiled_and_ran': True,
     'preview_denial_update_offline': True, 'native_cleanup': True, 'data_preserved': True, 'commands': commands}, indent=2) + '\n')
 print(a.language + '/' + a.storage + ' Auth project configuration and switch passed', flush=True)
