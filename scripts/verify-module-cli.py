@@ -74,5 +74,14 @@ source=project/('author/typescript/src/modules/auth/core.ts' if a.language=='typ
 if not a.official:source.write_text(source.read_text()+'\n// author update\n')
 run('code','update','auth','--yes');assert 'user customization' in core.read_text()
 if not a.official:assert 'author update' in core.read_text()
+if not a.official:
+ directory=project/'author/lenso.modules.toml'
+ original=directory.read_text();release=original[original.index('[[modules.auth.releases]]'):]
+ directory.write_text(original+'\n'+release.replace('0.2.0','0.2.1'))
+ assert run('code','preview','auth')['outputs']['resolve']['module']['version']=='0.2.0'
+ run('code','update','auth','--yes')
+ assert run('code','preview','@lenso/auth')['outputs']['resolve']['module']['version']=='0.2.1'
+ directory.write_text(directory.read_text().replace('reference = "v0.2.1"','reference = "moved-tag"'))
+ assert 'without a new version' in run('code','update','auth','--yes',expected=1)['message']
 (project/'verification.json').write_text(json.dumps({'language':a.language,'storage':a.storage,'entry':'code add auth','compiled_and_ran':True,'questions_consent_preview_offline_update':True},indent=2)+'\n')
 print(a.language+'/'+a.storage+' Code module consumer passed')
