@@ -52,8 +52,19 @@ Switching stores reconciles owned code/dependencies after preview and approval. 
 does **not** transfer or erase database records. The existing database stays intact;
 applications own data conversion and handwritten entry changes. Use the target
 sample, or submit the replacement binding and its configuration explicitly.
-Existing Auth 0.1 consumers can review `lenso preset apply auth` and
-`lenso code compose-preview --refresh --sample postgres` before applying generation.
+For an existing Auth 0.1 project, preset reapplication updates package constraints
+while retaining installed extension configuration and its source pin. Explicitly
+review the new module source ref before previewing:
+
+```sh
+lenso preset apply auth
+lenso ext configure code --input '{"ref":"v0.2.0"}'
+lenso code compose-preview --refresh --sample postgres
+lenso code compose --sample postgres
+```
+
+The existing language stays selected. Preview does not require a database connection;
+set `DATABASE_URL` when running the generated PostgreSQL application.
 
 For Agents, provide `--input '{"language":"typescript"}'` or
 `--input '{"language":"rust"}'` during initialization, and use the existing JSON /
