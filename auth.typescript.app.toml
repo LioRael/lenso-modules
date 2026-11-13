@@ -1,0 +1,96 @@
+schema_version = 1
+[modules.auth]
+version = "0.3.0"
+[modules.auth.supports]
+language = ["typescript"]
+runtime = ["node26"]
+app_host = ["lenso-http-v1"]
+[modules.auth.options.ttl_ms]
+prompt = "Session lifetime in milliseconds"
+kind = { type = "integer", min = 60000, max = 2592000000 }
+default = 86400000
+[modules.auth.slots.store]
+contract = "lenso.auth-store"
+version = "^0.1"
+[modules.auth.slots.passwords]
+contract = "lenso.password-hasher"
+version = "^0.1"
+[modules.sqlite]
+version = "0.3.0"
+[modules.sqlite.provides."lenso.auth-store"]
+version = "0.1.0"
+[modules.sqlite.options.path]
+prompt = "SQLite database path"
+kind = { type = "text" }
+default = "auth.sqlite"
+[modules.postgres]
+version = "0.3.0"
+[modules.postgres.provides."lenso.auth-store"]
+version = "0.1.0"
+[modules.postgres.options.connection]
+prompt = "PostgreSQL connection environment variable"
+kind = { type = "environment" }
+default = { env = "DATABASE_URL" }
+[modules.scrypt]
+version = "0.3.0"
+[modules.scrypt.provides."lenso.password-hasher"]
+version = "0.1.0"
+[resources]
+auth = [{ path = "typescript/src/modules/auth/core.ts", target = "core.ts" }, { path = "typescript/src/modules/auth/contracts.ts", target = "contracts.ts" }]
+sqlite = [{ path = "typescript/src/modules/sqlite/store.ts", target = "store.ts" }, { path = "typescript/src/modules/sqlite/schema.ts", target = "schema.ts" }]
+postgres = [{ path = "typescript/src/modules/postgres/store.ts", target = "store.ts" }, { path = "typescript/src/modules/postgres/schema.ts", target = "schema.ts" }]
+scrypt = [{ path = "typescript/src/modules/scrypt/hasher.ts", target = "hasher.ts" }]
+[generator]
+schema_version = 1
+directory = "generated/auth"
+files = [{scope="composition", template="templates/typescript/assembly.ts.j2", target="index.ts"}, {scope="composition", template="templates/typescript/integration.md.j2", target="README.md"}, {scope="composition",template="templates/typescript/host.ts.j2",target="host.ts"}]
+[samples.default]
+instances = { auth = "auth" }
+bindings = { "auth.store" = { type="module", module="sqlite" } }
+context = {language="typescript", runtime="node26",app_host="lenso-http-v1"}
+[samples.postgres]
+instances = { auth = "auth" }
+bindings = { "auth.store" = { type="module", module="postgres" } }
+context = {language="typescript", runtime="node26",app_host="lenso-http-v1"}
+
+[[generator.dependencies]]
+ecosystem="npm"
+package="@lenso/app"
+version="0.1.1"
+module="auth"
+options={}
+
+[[generator.dependencies]]
+ecosystem="npm"
+package="zod"
+version="^4"
+module="auth"
+options={}
+
+[[generator.dependencies]]
+ecosystem="npm"
+package="pg"
+version="^8.16"
+module="postgres"
+options={}
+
+[[generator.dependencies]]
+ecosystem="npm"
+package="@types/pg"
+version="^8.15"
+module="postgres"
+options={section="devDependencies"}
+
+[[generator.dependencies]]
+ecosystem="npm"
+package="@types/node"
+version="^26"
+module="auth"
+options={section="devDependencies"}
+
+[[generator.dependencies]]
+ecosystem="npm"
+package="typescript"
+version="^6"
+module="auth"
+options={section="devDependencies"}
