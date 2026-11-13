@@ -9,7 +9,10 @@ use lenso_auth_source::application::{
 #[ignore = "requires AUTH_POSTGRES_URL pointing to a disposable PostgreSQL database"]
 async fn real_postgres_contract() {
     let url = std::env::var("AUTH_POSTGRES_URL").expect("AUTH_POSTGRES_URL is required");
-    let realm = format!("rust_{}", std::process::id());
+    let realm = format!(
+        "rust_{}",
+        lenso_auth_source::application::auth::random_hex(8).unwrap()
+    );
     let a = PostgresAuthStore::connect(&url, &realm).await.unwrap();
     let b = PostgresAuthStore::connect(&url, &realm).await.unwrap();
     let other = PostgresAuthStore::connect(&url, &format!("{realm}_other"))
