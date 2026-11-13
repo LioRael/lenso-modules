@@ -1,7 +1,7 @@
 # Lenso Modules
 
 Editable functional modules built on the published Lenso SDKs. The first module is
-**Auth 0.2.1**: password registration/login and opaque sessions, with independent
+**Auth 0.3.0**: password registration/login and opaque sessions, with independent
 TypeScript and Rust implementations, SQLite/PostgreSQL stores and a bounded scrypt provider.
 
 This repository owns business interfaces, implementations, adapters, templates and
@@ -11,9 +11,37 @@ curated names/presets in [lenso-registry](https://github.com/LioRael/lenso-regis
 No SDK changes are required. Source consumers use `@lenso/app` / `lenso-app` 0.1.1
 from npm/crates.io, not workspace path dependencies.
 
+## Create a native application
+
+App 0.1.0 and Code 0.3.6 add a native host before installing Auth:
+
+```sh
+lenso new my-api --preset app
+cd my-api
+lenso code config --provider lenso.auth-store=sqlite
+lenso code preview auth
+lenso code add auth
+lenso app migrate
+lenso app run
+```
+
+Choose TypeScript/Node.js 26 or Rust/Tokio (Rust 1.99.0). The empty app exposes
+`GET /health`; Auth then adds register/login/session/logout routes. PostgreSQL
+uses the same workflow with `lenso.auth-store=postgres` and runtime DATABASE_URL
+in the app's `.env`. Preview does not connect to the database. Migrations are
+explicit, and application startup checks the existing schema without modifying it.
+
+App records `app_host="lenso-http-v1"` as a fixed project convention. The directory
+then chooses `auth.typescript.app.toml` or `auth.rust.app.toml`. These add native
+HTTP transport templates over the same SDK-backed business source. The reusable
+base catalogs remain available without that convention. Initial App transport
+mounts one root instance named `auth`; custom multi-instance hosts use the base
+catalogs. SDK and CLI Runtime require no changes. App/Code/module releases and the
+official Registry must be synchronized before using these commands publicly.
+
 ## Install in a prepared application
 
-Requires Code 0.3.4 and a prepared native application. Install the extension once,
+Requires Code 0.3.6 and a prepared native application. Install the extension once,
 then add functional modules through Code:
 
 ```sh
@@ -179,7 +207,7 @@ Packages in this repository are private build/test consumers. Functional source 
 distributed from immutable Git snapshots; it is not an npm/crates.io Auth package.
 
 `scripts/verify-module-cli.py` is the primary module-directory acceptance. It uses
-Code 0.3.4, project language/runtime/path/provider/option defaults, real compilation
+Code 0.3.6, project language/runtime/path/provider/option defaults, real compilation
 and database actions, then switches storage in both directions without clearing
 Auth settings. It checks denied plans, retained defaults, source/dependency cleanup,
 data preservation, customization-preserving updates and offline replay. Its four

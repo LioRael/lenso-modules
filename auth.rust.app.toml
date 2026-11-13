@@ -1,0 +1,166 @@
+schema_version = 1
+[modules.auth]
+version = "0.3.0"
+[modules.auth.supports]
+language = ["rust"]
+runtime = ["tokio"]
+app_host = ["lenso-http-v1"]
+[modules.auth.options.ttl_ms]
+prompt = "Session lifetime in milliseconds"
+kind = { type = "integer", min = 60000, max = 2592000000 }
+default = 86400000
+[modules.auth.slots.store]
+contract = "lenso.auth-store"
+version = "^0.1"
+[modules.auth.slots.passwords]
+contract = "lenso.password-hasher"
+version = "^0.1"
+[modules.sqlite]
+version = "0.3.0"
+[modules.sqlite.provides."lenso.auth-store"]
+version = "0.1.0"
+[modules.sqlite.options.path]
+prompt = "SQLite database path"
+kind = { type = "text" }
+default = "auth.sqlite"
+[modules.postgres]
+version = "0.3.0"
+[modules.postgres.provides."lenso.auth-store"]
+version = "0.1.0"
+[modules.postgres.options.connection]
+prompt = "PostgreSQL connection environment variable"
+kind = { type = "environment" }
+default = { env = "DATABASE_URL" }
+[modules.scrypt]
+version = "0.3.0"
+[modules.scrypt.provides."lenso.password-hasher"]
+version = "0.1.0"
+[resources]
+auth = [{ path = "rust/src/modules/auth/mod.rs", target = "mod.rs" }]
+sqlite = [{ path = "rust/src/modules/sqlite/mod.rs", target = "mod.rs" }, { path = "rust/src/modules/sqlite/schema.sql", target = "schema.sql" }]
+postgres = [{ path = "rust/src/modules/postgres/mod.rs", target = "mod.rs" }, { path = "rust/src/modules/postgres/schema.sql", target = "schema.sql" }]
+scrypt = [{ path = "rust/src/modules/scrypt/mod.rs", target = "mod.rs" }]
+[generator]
+schema_version = 1
+directory = "generated/auth"
+files = [{scope="composition", template="templates/rust/assembly.rs.j2", target="mod.rs"}, {scope="composition", template="templates/rust/integration.md.j2", target="README.md"}, {scope="composition",template="templates/rust/host.rs.j2",target="host.rs"}]
+[samples.default]
+instances = { auth = "auth" }
+bindings = { "auth.store" = { type="module", module="sqlite" } }
+context = {language="rust", runtime="tokio",app_host="lenso-http-v1"}
+[samples.postgres]
+instances = { auth = "auth" }
+bindings = { "auth.store" = { type="module", module="postgres" } }
+context = {language="rust", runtime="tokio",app_host="lenso-http-v1"}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="lenso-app"
+version="0.1.1"
+module="auth"
+options={features=["json"]}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="serde"
+version="1"
+module="auth"
+options={features=["derive"]}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="sha2"
+version="0.10"
+module="auth"
+options={}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="getrandom"
+version="0.3"
+module="auth"
+options={}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="rusqlite"
+version="0.42"
+module="sqlite"
+options={features=["bundled"]}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="tokio"
+version="1"
+module="sqlite"
+options={features=["rt", "sync"]}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="tokio"
+version="1"
+module="scrypt"
+options={features=["rt", "sync"]}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="scrypt"
+version="0.11"
+module="scrypt"
+options={}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="subtle"
+version="2"
+module="scrypt"
+options={}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="tokio-postgres"
+version="0.7"
+module="postgres"
+options={}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="postgres-native-tls"
+version="0.5"
+module="postgres"
+options={}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="native-tls"
+version="0.2"
+module="postgres"
+options={}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="tokio"
+version="1"
+module="postgres"
+options={features=["rt", "sync", "net", "time"]}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="tokio"
+version="1"
+module="auth"
+options={features=["macros","net","rt","rt-multi-thread","signal","sync","time"]}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="axum"
+version="0.8"
+module="auth"
+options={}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="serde_json"
+version="1"
+module="auth"
+options={}

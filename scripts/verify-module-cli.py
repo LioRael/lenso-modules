@@ -37,7 +37,7 @@ if not a.official:
     code.mkdir(parents=True)
     for name in ['extension.toml', 'code.wasm']:
         shutil.copyfile(a.code_source.parent / name, code / name)
-    (project / 'code.preset.toml').write_text('schema_version=1\nid="@lenso/code"\nversion="0.3.4"\nadopt="code/ready"\n[[extensions]]\nid="code"\nsource="lenso/extensions/code/extension.toml"\n')
+    (project / 'code.preset.toml').write_text('schema_version=1\nid="@lenso/code"\nversion="0.3.6"\nadopt="code/ready"\n[[extensions]]\nid="code"\nsource="lenso/extensions/code/extension.toml"\n')
 if a.language == 'typescript':
     (project / 'package.json').write_text(json.dumps({'name': 'module-consumer', 'private': True, 'type': 'module',
         'imports': {'#modules/*': {'types': './src/features/*', 'default': './dist/features/*'}}}))
@@ -78,7 +78,7 @@ setup = ['--input', json.dumps({'author_root': 'author', 'format': 'lenso-module
 run('init', '--preset', 'code' if a.official else 'code.preset.toml', *setup, '--yes', *creds)
 lock = json.loads((project / 'lenso.lock').read_text())
 code_version = next(x for x in lock['extensions'] if x['id'] == 'code')['definition']['version']
-assert (0, 3, 4) <= tuple(map(int, code_version.split('.'))) < (0, 4, 0), code_version
+assert (0, 3, 6) <= tuple(map(int, code_version.split('.'))) < (0, 4, 0), code_version
 assert any(x['name'] == 'auth' for x in run('code', 'search', 'auth')['outputs']['search']['results'])
 choice = run('code', 'add', 'auth', '--yes', expected=2)
 assert choice['question']['id'].startswith('code:module-language:')
@@ -94,7 +94,7 @@ assert not (project / 'lenso.code.toml').exists()
 run('code', 'config', '--input', json.dumps({'settings': settings}), '--yes')
 config_bytes = (project / 'lenso.code.toml').read_bytes()
 preview = run('code', 'preview', 'auth')['outputs']['resolve']
-assert preview['module']['version'] == '0.2.1'
+assert preview['module']['version'] == '0.3.0'
 assert not (project / 'src/code.modules.json').exists()
 pending = run('code', 'add', 'auth', expected=2)
 answers = project / 'decline.json'
@@ -180,11 +180,11 @@ if local:
     # Copy the entire latest release, including its language targets.
     start = original.rfind('[[modules.auth.releases]]\n')
     release = original[start:]
-    directory.write_text(original + '\n' + release.replace('0.2.1', '0.2.2'))
-    assert run('code', 'preview', 'auth')['outputs']['resolve']['module']['version'] == '0.2.1'
+    directory.write_text(original + '\n' + release.replace('0.3.0', '0.3.1'))
+    assert run('code', 'preview', 'auth')['outputs']['resolve']['module']['version'] == '0.3.0'
     run('code', 'update', 'auth', '--yes')
-    assert run('code', 'preview', '@lenso/auth')['outputs']['resolve']['module']['version'] == '0.2.2'
-    directory.write_text(directory.read_text().replace('reference = "v0.2.2"', 'reference = "moved-tag"'))
+    assert run('code', 'preview', '@lenso/auth')['outputs']['resolve']['module']['version'] == '0.3.1'
+    directory.write_text(directory.read_text().replace('reference = "v0.3.1"', 'reference = "moved-tag"'))
     run('code', 'update', 'auth', '--yes', expected=1)
 (project / 'verification.json').write_text(json.dumps({'language': a.language, 'storage': a.storage, 'switched_to': other,
     'official': a.official, 'local_modules': local, 'code_version': code_version, 'project_config': True, 'compiled_and_ran': True,

@@ -1,0 +1,35 @@
+import { Executor, ActionError } from "@lenso/app";
+import { i_61757468 } from "./index.js";
+interface Request { method: string; path: string; authorization: string | undefined; body: unknown }
+export async function mount(migrate: boolean) {
+  const app = i_61757468();
+  try { if (migrate) await app.store.migrate(); await app.store.checkSchema(); }
+  catch (error) { await app.store.close(); throw error; }
+  const executor = new Executor(() => {});
+  let active = 0;
+  return {
+    close: async () => { await app.store.close(); },
+    handle: async (request: Request) => {
+      const route = `${request.method} ${request.path}`;
+      if (!["POST /auth/register", "POST /auth/login", "GET /auth/session", "POST /auth/logout"].includes(route)) return undefined;
+      if (active >= 4) return { status: 429, body: { code: "capacity" } };
+      active++;
+      const token = request.authorization?.startsWith("Bearer ") ? request.authorization.slice(7) : undefined;
+      try {
+        const context = { callId: crypto.randomUUID(), principal: await app.principal(token), resources: app.resources, signal: new AbortController().signal };
+        let body: unknown;
+        switch (route) {
+          case "POST /auth/register": body = await executor.callExternal(app.actions.register, context, request.body); break;
+          case "POST /auth/login": body = await executor.callExternal(app.actions.login, context, request.body); break;
+          case "POST /auth/logout": body = await executor.callExternal(app.actions.logout, context, { token: token ?? "" }); break;
+          default: body = await executor.callExternal(app.actions.session, context, null);
+        }
+        return { status: 200, body };
+      } catch (cause) {
+        const error = cause instanceof ActionError ? cause : new ActionError("internal", "Authentication operation failed", { cause });
+        const status = { invalid_input: 400, unauthenticated: 401, forbidden: 403, conflict: 409, not_found: 404, cancelled: 499, internal: 500 }[error.code];
+        return { status, body: { code: error.code, message: error.code === "internal" ? "Authentication operation failed" : error.message } };
+      } finally { active--; }
+    },
+  };
+}

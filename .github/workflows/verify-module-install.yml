@@ -13,7 +13,11 @@ permissions:
 jobs:
   install:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [typescript, rust]
     services:
       postgres:
         image: postgres:18
@@ -27,6 +31,12 @@ jobs:
           --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: LioRael/lenso-cli
+          ref: 9023775604e41aff1375251ee88ba3c52210c491
+          path: dist/cli-source
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '26'
@@ -35,21 +45,40 @@ jobs:
         run: |
           curl -fsSL --retry 2 https://github.com/LioRael/lenso-cli/releases/download/v1.0.0/install.sh -o "$RUNNER_TEMP/install.sh"
           sh "$RUNNER_TEMP/install.sh" --prefix "$RUNNER_TEMP/bin"
-      - name: Consume official Code and Auth modules
+      - name: Build reviewed App and Code sources for PR consumers
+        if: github.event_name == 'pull_request'
+        working-directory: dist/cli-source
+        run: |
+          rustup target add wasm32-unknown-unknown --toolchain 1.99.0
+          for id in code app; do
+            cargo +1.99.0 build --locked --release --target wasm32-unknown-unknown --manifest-path "extensions/$id/Cargo.toml"
+            mkdir -p "dist/author/$id"
+            cp "presets/$id/extension.toml" "dist/author/$id/extension.toml"
+            cp "extensions/$id/target/wasm32-unknown-unknown/release/lenso_${id}.wasm" "dist/author/$id/$id.wasm"
+            "$RUNNER_TEMP/bin/lenso" package --id "$id" --out "dist/mainline/$id" --json
+          done
+      - name: Consume Code and Auth modules
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          LANGUAGE: ${{ matrix.language }}
           DATABASE_URL: postgresql://lenso:test-only-password@127.0.0.1:${{ job.services.postgres.ports[5432] }}/modules?sslmode=disable
         run: |
           npm ci
-          local=()
-          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then local=(--local-modules); fi
-          for language in typescript rust; do
-            for storage in sqlite postgres; do
-              python3 scripts/verify-module-cli.py --binary "$RUNNER_TEMP/bin/lenso" --official "${local[@]}" --token-env GITHUB_TOKEN --language "$language" --storage "$storage" --out "$RUNNER_TEMP/consumers/$language-$storage"
-            done
+          source=(--official)
+          app_source=(--official)
+          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
+            source=(--code-source "$GITHUB_WORKSPACE/dist/cli-source/dist/author/code/extension.toml")
+            app_source=(--modules "$GITHUB_WORKSPACE")
+          fi
+          for storage in sqlite postgres; do
+            python3 scripts/verify-module-cli.py --binary "$RUNNER_TEMP/bin/lenso" "${source[@]}" --token-env GITHUB_TOKEN --language "$LANGUAGE" --storage "$storage" --out "$RUNNER_TEMP/consumers/$LANGUAGE-$storage"
           done
+          python3 dist/cli-source/scripts/verify-app.py --binary "$RUNNER_TEMP/bin/lenso" \
+            "${app_source[@]}" --language "$LANGUAGE" --storage both --out "$RUNNER_TEMP/apps"
       - uses: actions/upload-artifact@v7
         with:
-          name: code-module-consumers
-          path: ${{ runner.temp }}/consumers/*/verification.json
+          name: code-module-consumers-${{ matrix.language }}
+          path: |
+            ${{ runner.temp }}/consumers/*/verification.json
+            ${{ runner.temp }}/apps/**/verification.json
           if-no-files-found: error
