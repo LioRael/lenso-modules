@@ -1,0 +1,45 @@
+name: Verify Code module installation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  install:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: lenso
+          POSTGRES_PASSWORD: test-only-password
+          POSTGRES_DB: modules
+        ports: ['5432/tcp']
+        options: >-
+          --health-cmd "pg_isready -U lenso -d modules"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - uses: dtolnay/rust-toolchain@1.99.0
+      - name: Install published CLI
+        run: |
+          curl -fsSL --retry 2 https://github.com/LioRael/lenso-cli/releases/download/v1.0.0/install.sh -o "$RUNNER_TEMP/install.sh"
+          sh "$RUNNER_TEMP/install.sh" --prefix "$RUNNER_TEMP/bin"
+      - name: Consume official Code and Auth modules
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DATABASE_URL: postgresql://lenso:test-only-password@127.0.0.1:${{ job.services.postgres.ports[5432] }}/modules?sslmode=disable
+        run: |
+          for language in typescript rust; do
+            for storage in sqlite postgres; do
+              python3 scripts/verify-module-cli.py --binary "$RUNNER_TEMP/bin/lenso" --official --token-env GITHUB_TOKEN --language "$language" --storage "$storage" --out "$RUNNER_TEMP/consumers/$language-$storage"
+            done
+          done
+      - uses: actions/upload-artifact@v7
+        with:
+          name: code-module-consumers
+          path: ${{ runner.temp }}/consumers/*/verification.json
+          if-no-files-found: error

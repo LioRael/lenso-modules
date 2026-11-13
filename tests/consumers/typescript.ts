@@ -1,0 +1,12 @@
+import { Executor } from "@lenso/app";
+import { i_61757468 } from "./generated/auth/assembly/index.js";
+const app=i_61757468("consumer.sqlite");await app.store.migrate();
+const executor=new Executor(()=>{});
+const context={callId:"consumer",principal:undefined,resources:app.resources,signal:new AbortController().signal};
+const user=await executor.call(app.actions.register,context,{name:"consumer_"+process.pid,password:"correct horse battery"});
+const session=await executor.call(app.actions.login,context,{name:"consumer_"+process.pid,password:"correct horse battery"});
+const principal=await app.principal(session.token);
+if(principal?.subject!==user.id)throw new Error("identity mismatch");
+await executor.call(app.actions.logout,{...context,principal},{token:session.token});
+if(await app.principal(session.token))throw new Error("revocation failed");
+await app.store.close();console.log("AUTH_USER_ID="+user.id);console.log("AUTH_CONSUMER_OK");
