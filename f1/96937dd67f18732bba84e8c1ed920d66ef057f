@@ -1,0 +1,27 @@
+auth.rust.toml
+  s_c5695907fe744f::t_3859e8d073477c 6,39,42
+auth.typescript.toml
+  s_c5695907fe744f::t_8a9c3f75612275 6,39,42
+contracts/auth/contract.md
+  s_c5695907fe744f::t_3d8494e80401e3 4
+scripts/catalogs.py
+  s_c5695907fe744f::t_dc690243863b77 7,17,50,53
+tests/http.test.mjs
+  s_c5695907fe744f::t_cd049ca4a8af1f 15-16,23,46-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f196937dd67f18732bba84e8c1ed920d66ef057f",
+  "prompts": {},
+  "sessions": {
+    "s_c5695907fe744f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1d06d-149b-7062-aa67-3c0145df9d90",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "LioRael <leo@lenso.dev>"
+    }
+  }
+}
