@@ -1,0 +1,118 @@
+docs/module-metadata-acceptance/rust.json
+  s_0a36fa17311984::t_0aa6b6634ee752 1-909
+templates/typescript/host-v2.ts.j2
+  s_0a36fa17311984::t_974e4b85b1af9c 31
+  s_0a36fa17311984::t_787a9ed41bb82e 37
+tests/metadata.test.mjs
+  s_0a36fa17311984::t_70064de03ff18a 27-30
+  s_0a36fa17311984::t_015d5878f58bcb 1-26,31-54
+rust/src/modules/files/mod.rs
+  s_0a36fa17311984::t_974e4b85b1af9c 142-146,185-189,229-242,274-505
+typescript/tests/metadata.test.mjs
+  s_0a36fa17311984::t_8dc3470ab929e2 1-61
+rust/src/bin/metadata-server.rs
+  s_0a36fa17311984::t_fc7350190a3888 1-179
+docs/files.md
+  s_0a36fa17311984::t_6016c61b7612e4 112-115
+auth.rust.app.toml
+  s_0a36fa17311984::t_974e4b85b1af9c 39
+auth.typescript.toml
+  s_0a36fa17311984::t_974e4b85b1af9c 38
+templates/typescript/host.ts.j2
+  s_0a36fa17311984::t_974e4b85b1af9c 31
+typescript/src/server.ts
+  s_0a36fa17311984::t_6d9a900e73da39 36
+  s_0a36fa17311984::t_974e4b85b1af9c 49
+scripts/catalogs.py
+  s_0a36fa17311984::t_974e4b85b1af9c 10,112-114
+docs/module-metadata-acceptance.md
+  s_0a36fa17311984::t_5d5373052449cd 20
+  s_0a36fa17311984::t_6016c61b7612e4 1-2,4-12,14-17,19,21-24
+  s_0a36fa17311984::t_0aa6b6634ee752 3,13,18
+auth.typescript.app-v2.toml
+  s_0a36fa17311984::t_974e4b85b1af9c 39
+templates/rust/host.rs.j2
+  s_0a36fa17311984::t_6d9a900e73da39 102-103
+  s_0a36fa17311984::t_974e4b85b1af9c 41-43
+docs/module-metadata.md
+  s_0a36fa17311984::t_6016c61b7612e4 1-49
+auth.rust.app-v2.toml
+  s_0a36fa17311984::t_974e4b85b1af9c 39
+files.rust.toml
+  s_0a36fa17311984::t_974e4b85b1af9c 40
+scripts/files-catalogs.py
+  s_0a36fa17311984::t_974e4b85b1af9c 46,77-79
+templates/rust/files.rs.j2
+  s_0a36fa17311984::t_787a9ed41bb82e 72-73
+  s_0a36fa17311984::t_974e4b85b1af9c 20-21
+rust/Cargo.toml
+  s_0a36fa17311984::t_fc7350190a3888 24
+rust/src/modules/auth/mod.rs
+  s_0a36fa17311984::t_974e4b85b1af9c 2-5,117-128,130,137-145,148-149,262-267,281-283,308-310,349-351,369-371,377-378
+files.typescript.toml
+  s_0a36fa17311984::t_974e4b85b1af9c 40
+templates/typescript/files.ts.j2
+  s_0a36fa17311984::t_974e4b85b1af9c 47
+  s_0a36fa17311984::t_787a9ed41bb82e 1,26
+scripts/verify-sdk-metadata.py
+  s_0a36fa17311984::t_ce9b347f803866 5-6,57-59
+  s_0a36fa17311984::t_8dc3470ab929e2 1-4,7-47,49,51-52,56,60
+  s_0a36fa17311984::t_9335641ef33c63 48,50,53-55
+rust/src/bin/auth-server.rs
+  s_0a36fa17311984::t_974e4b85b1af9c 37-38,40,44
+  s_0a36fa17311984::t_6d9a900e73da39 105-112
+auth.typescript.app.toml
+  s_0a36fa17311984::t_974e4b85b1af9c 39
+rust/tests/metadata.rs
+  s_0a36fa17311984::t_787a9ed41bb82e 1-200
+auth.rust.toml
+  s_0a36fa17311984::t_974e4b85b1af9c 38
+README.md
+  s_0a36fa17311984::t_6016c61b7612e4 14-17
+docs/module-metadata-acceptance/integration.log
+  s_0a36fa17311984::t_0aa6b6634ee752 1-16
+docs/module-metadata-acceptance/typescript.json
+  s_0a36fa17311984::t_0aa6b6634ee752 1-909
+docs/module-metadata-acceptance/verification.json
+  s_0a36fa17311984::t_0aa6b6634ee752 1-23
+typescript/src/metadata-server.ts
+  s_0a36fa17311984::t_fc7350190a3888 1-52
+templates/rust/host-v2.rs.j2
+  s_0a36fa17311984::t_974e4b85b1af9c 41-43
+  s_0a36fa17311984::t_787a9ed41bb82e 163-166
+  s_0a36fa17311984::t_6d9a900e73da39 102-103
+contracts/auth/metadata.json
+  s_0a36fa17311984::t_ba827242fdded6 1-171
+contracts/files/metadata.json
+  s_0a36fa17311984::t_e8baa9361691b9 1-246
+rust/Cargo.lock
+  s_0a36fa17311984::t_fb4f724acf3dd9 672
+rust/src/modules/auth/metadata.json
+  s_0a36fa17311984::t_8131cb7d2fc9b8 1-171
+rust/src/modules/files/metadata.json
+  s_0a36fa17311984::t_4f87b9eb5ef3a3 1-246
+typescript/src/modules/auth/core.ts
+  s_0a36fa17311984::t_8f8c39ba78a782 5,29,36,50,59,71
+typescript/src/modules/auth/metadata.json
+  s_0a36fa17311984::t_15157fa7c191a8 1-171
+typescript/src/modules/files/core.ts
+  s_0a36fa17311984::t_ad00e957f72303 2-3,31,50,76-79,101-133
+typescript/src/modules/files/metadata.json
+  s_0a36fa17311984::t_c2d2affca2a378 1-246
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0b1d4495b60305426662809c75653da542f22227",
+  "prompts": {},
+  "sessions": {
+    "s_0a36fa17311984": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1daa8-3fb7-7c03-beac-1e3b4a74162a",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "LioRael <leo@lenso.dev>"
+    }
+  }
+}
