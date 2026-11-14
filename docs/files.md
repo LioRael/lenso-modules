@@ -1,9 +1,8 @@
 # Private Files v1
 
-Status: implemented in the Files development branch. Requires App 0.2.0 native
-HTTP protocol v2, Code 0.3.6 and the Auth shared-identity transport prepared for
-module source train v0.4.0. Files itself is version 0.1.0. Public installation is
-available only after those releases and the official app preset are synchronized.
+Status: published Files 0.1.0 and Auth 0.4.0 from module source v0.4.0, with
+App 0.2.0 host protocol v2 and Code 0.3.6. The official app preset and Registry
+select the compatible extension versions. Files remains a Code module.
 The SDK and CLI Runtime are unchanged.
 
 ## Ownership and variants
@@ -28,8 +27,6 @@ foreign key or direct import into Auth internals. The Files HTTP variant initial
 uses the primary root instance `files`, alongside one application identity provider.
 
 ## Project flow
-
-After publication:
 
 ```sh
 lenso new my-api --preset app
