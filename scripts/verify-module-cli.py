@@ -179,7 +179,8 @@ if local:
     original = directory.read_text()
     # Copy the entire latest release, including its language targets.
     start = original.rfind('[[modules.auth.releases]]\n')
-    release = original[start:]
+    end = original.find('\n[modules.', start)
+    release = original[start:] if end < 0 else original[start:end]
     directory.write_text(original + '\n' + release.replace('0.4.0', '0.4.1'))
     assert run('code', 'preview', 'auth')['outputs']['resolve']['module']['version'] == '0.4.0'
     run('code', 'update', 'auth', '--yes')
