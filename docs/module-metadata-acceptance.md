@@ -1,6 +1,36 @@
 # Auth/Files SDK metadata acceptance
 
-Local acceptance on 2026-11-15 (UTC+8), macOS arm64, Node.js 26.10.0, Rust 1.99.0 and disposable PostgreSQL 18. Tests use the reviewed SDK main commit `9d5edceb8d206b46b2c337ff77caebdc9927f8a8` in a temporary source consumer. These results do not establish compatibility with published SDK 0.1.1, which lacks the new APIs. No module/SDK/CLI release or remote CI run is part of this batch.
+## SDK publication and registry consumers
+
+The compatible SDK is published: `@lenso/app` 0.1.2, `lenso-app` 0.1.2 and `@lenso/console` 3.1.0. [SDK publication 43639576110](https://github.com/LioRael/lenso/actions/runs/43639576110) completed through OIDC trusted publishing; npm provenance and crates.io trusted publisher data identify source commit `13a83df807cbd6ca520954dc2c1b35c2b7d52107`. SQLite SDK packages retain 0.1.1. Module manifests, npm/Cargo locks and generated Auth/Files catalogs now use registry App 0.1.2. The temporary SDK override has been removed.
+
+A clean temporary registry consumer on macOS arm64 passed the same 10 TS, 10 Rust and five real-process HTTP cases, together with lint, native Cargo check/Clippy/docs/format. Its [verification record](module-metadata-acceptance/registry-macos/verification.json), [TS report](module-metadata-acceptance/registry-macos/typescript.json), [Rust report](module-metadata-acceptance/registry-macos/rust.json) and [HTTP log](module-metadata-acceptance/registry-macos/integration.log) preserve actual results. This run used Node.js 26.10.0 and Rust 1.99.0; PostgreSQL acceptance remains separately recorded below and in hosted CI.
+
+## Hosted cross-platform acceptance
+
+Implementation head `f6e35616f92d298f7e6542d21fbc24d3b6e51f3d` passed all eight [source CI jobs](https://github.com/LioRael/lenso-modules/actions/runs/43640925161) and all four [full CLI jobs](https://github.com/LioRael/lenso-modules/actions/runs/43640925090). The [cross-platform record](module-metadata-acceptance/cross-platform.json) preserves run/head/artifact identities, verified ZIP digests, platform facts, actual installed SDK versions and per-project behavior results. [SDK registry facts](module-metadata-acceptance/sdk-release.json) retain package integrity and publishing provenance.
+
+| Check | Ubuntu 24.04 x86_64 | macOS 15 arm64 |
+| --- | --- | --- |
+| TS strict build, lint and behavioral regression | 10 passed | 10 passed |
+| Rust check, tests, strict Clippy, docs and fmt | 10 passed; PostgreSQL case separately exercised | 10 passed; PostgreSQL case separately exercised |
+| Real-process Auth/Files HTTP regression | Five passed | Five passed |
+| Full TypeScript CLI projects | Eight passed | Eight passed |
+| Full Rust CLI projects | Eight passed | Eight passed |
+
+Hosted runs use Node.js 26.13.1 and Rust 1.99.0. Native Auth PostgreSQL tests additionally pass on Linux against PostgreSQL 16 and 18, one TS and one Rust test per server version. The full CLI matrix uses disposable PostgreSQL 18 on both platforms and SQLite. All disposable database services are explicitly stopped.
+
+Each language/platform validates eight final projects: two Auth consumers with source updates and bidirectional provider switching, two App/Auth installations, two standalone Files installations, and two App 0.1.0-to-0.2.0 upgrades, one per store. All **32 projects** resolve SDK 0.1.2 from npm/crates.io with registry integrity/checksum data. No SDK path patch or source archive substitute is used. Generated Auth consumers assert metadata and safe field issues before/after updates and provider switching. The reviewed App/Code Wasm comes from CLI commit `c78821993df005f0f46c0e2a81bfb75d5907cf66`; the native CLI is installed by the published installer. Current module source is supplied as the local author input, not mislabeled as a published Auth/Files release.
+
+Both stores' upgrades retain an existing authenticated session and user host customizations. Files cases transfer 1,049,287 bytes through native streams, verify owner isolation and revocation, restart with persisted data, delete real content, compensate oversized/interrupted writes and preserve locked/offline preview behavior. Reports for all four hosted TS/Rust HTTP runtimes share an identical canonical public contract and observed effects after excluding only platform/runtime labels.
+
+Coverage fixes in this delivery include adding Auth's direct serde_json dependency to generated Rust catalogs, building the new metadata fixture binary for integration, and removing the prerelease SDK override. The inherited upgrade command previously defaulted to SQLite despite the fresh-install matrix covering both stores. It now explicitly requests both stores; an eight-project-per-job gate rejects missing cases. Earlier superseded partial runs were canceled and are not counted as complete acceptance.
+
+Module/Registry releases remain unchanged. Windows, physical devices, production deployments and LLM tool-selection quality are outside these checks. This batch does not add a Console UI or a standalone MCP service.
+
+## Initial source validation
+
+Local acceptance on 2026-11-15 (UTC+8), macOS arm64, Node.js 26.10.0, Rust 1.99.0 and disposable PostgreSQL 18. Tests use the reviewed SDK main commit `9d5edceb8d206b46b2c337ff77caebdc9927f8a8` in a temporary source consumer. These results do not establish compatibility with published SDK 0.1.1, which lacks the new APIs. This historical first run preceded the SDK release; it used a temporary SDK source override. Current validation uses the published registry SDK, as recorded above.
 
 | Check | Result and scope |
 | --- | --- |
@@ -21,4 +51,4 @@ The added regressions establish metadata snapshot ownership, no discovery access
 
 The real-process fixtures register and log in users through HTTP, read an authenticated SDK-derived catalog, reject malformed/wrong-type credentials without leaking the fake private input, reject unsafe names/pages, compensate oversized uploads, round-trip native content and enforce ownership on read/delete. Each runtime observes two persisted accounts with hashed session storage, one successful upload, one delete and zero remaining files. Description reads produce no file operations; fixture metadata contains neither raw credentials/tokens nor storage paths.
 
-The fixture is a thin native HTTP consumer, not an LLM or separate MCP transport. Generated v2 host descriptions and error projections are included in the source/templates, but full CLI-generated installation, provider switching and App upgrade workflows remain unrun for this batch. Windows, Linux, remote macOS CI and other PostgreSQL versions are unverified here. No Console UI, object-store provider or data migration is added.
+The fixture is a thin native HTTP consumer, not an LLM or separate MCP transport. The initial local run did not cover full CLI installation or hosted platforms. Hosted source/CLI runs are recorded separately. Windows remains outside the verified scope. No Console UI, object-store provider or data migration is added.
