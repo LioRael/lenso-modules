@@ -1,0 +1,70 @@
+#[path="../modules/files/mod.rs"] pub mod files;
+#[path="../modules/local/local.rs"] pub mod local;
+{% set store = resolution.instances[resolution.instances.files.bindings.metadata] %}
+{% if store.module == "postgres" %}#[path="../modules/postgres/store.rs"] pub mod store;
+type Store=store::PostgresFiles;
+{% else %}#[path="../modules/sqlite/store.rs"] pub mod store;
+type Store=store::SqliteFiles;{% endif %}
+use axum::{Router,Json,body::Body,extract::{Request,State,Path,Query},http::{StatusCode,header},response::{IntoResponse,Response},routing::{get,post}};
+use lenso_app::{ActionError,ErrorCode,Principal};
+use serde::Deserialize;
+use serde_json::json;
+use std::sync::Arc;
+#[derive(Clone)]
+struct Host {files:Arc<files::Files<Store,local::LocalBlobs>>,identity:Arc<dyn crate::lenso_host::Identity>,permits:Arc<tokio::sync::Semaphore>}
+#[derive(Deserialize)] struct Upload {name:String}
+#[derive(Deserialize)] struct Page { #[serde(default)] after:String,#[serde(default="default_limit")] limit:u32}
+fn default_limit()->u32{20}
+fn failure(error:ActionError)->Response {
+ let status=match error.code(){ErrorCode::InvalidInput=>StatusCode::BAD_REQUEST,ErrorCode::Unauthenticated=>StatusCode::UNAUTHORIZED,ErrorCode::Forbidden=>StatusCode::FORBIDDEN,ErrorCode::NotFound=>StatusCode::NOT_FOUND,ErrorCode::Conflict=>StatusCode::CONFLICT,ErrorCode::Cancelled=>StatusCode::REQUEST_TIMEOUT,_=>StatusCode::INTERNAL_SERVER_ERROR};
+ (status,Json(json!({"code":error.code().as_str(),"message":if error.code()==ErrorCode::Internal{"File operation failed"}else{error.message()}}))).into_response()
+}
+fn bearer(request:&Request)->Option<String>{ request.headers().get(header::AUTHORIZATION).and_then(|v|v.to_str().ok()).and_then(|v|v.strip_prefix("Bearer ")).map(str::to_owned) }
+async fn principal(host:&Host,token:Option<String>)->Result<Option<Principal>,ActionError>{
+ host.identity.resolve(token.as_deref()).await.map(|p|p.map(|p|Principal{subject:p.subject,scopes:p.scopes})).map_err(files::unavailable)
+}
+async fn upload(State(host):State<Host>,Query(input):Query<Upload>,request:Request)->Response {
+ let Ok(_permit)=host.permits.clone().try_acquire_owned() else{return StatusCode::TOO_MANY_REQUESTS.into_response();};
+ let result=async move{
+  let principal=principal(&host,bearer(&request)).await?;
+  use tokio_util::io::StreamReader;
+  use futures_util::TryStreamExt;
+  let stream=request.into_body().into_data_stream().map_err(std::io::Error::other);
+  tokio::time::timeout(std::time::Duration::from_secs(30),host.files.upload(principal.as_ref(),&input.name,StreamReader::new(stream))).await.map_err(|_|ActionError::new(ErrorCode::Cancelled,"Upload deadline exceeded"))?
+ }.await;
+ match result{Ok(file)=>(StatusCode::CREATED,Json(file)).into_response(),Err(e)=>failure(e)}
+}
+async fn list(State(host):State<Host>,Query(page):Query<Page>,request:Request)->Response {
+ let result=async move {let p=principal(&host,bearer(&request)).await?;host.files.list(p.as_ref(),&page.after,page.limit).await}.await;
+ match result{Ok(files)=>Json(json!({"files":files})).into_response(),Err(e)=>failure(e)}
+}
+async fn stat(State(host):State<Host>,Path(id):Path<String>,request:Request)->Response {
+ let result=async move {let p=principal(&host,bearer(&request)).await?;host.files.stat(p.as_ref(),&id).await}.await;
+ match result{Ok(file)=>Json(file).into_response(),Err(e)=>failure(e)}
+}
+async fn download(State(host):State<Host>,Path(id):Path<String>,request:Request)->Response {
+ let Ok(permit)=host.permits.clone().try_acquire_owned() else{return StatusCode::TOO_MANY_REQUESTS.into_response();};
+ let result=async move {let p=principal(&host,bearer(&request)).await?;host.files.download(p.as_ref(),&id).await}.await;
+ match result{Ok((file,reader))=>{
+  use futures_util::StreamExt;
+  let stream=futures_util::stream::unfold((tokio_util::io::ReaderStream::new(reader),permit),|(mut stream,permit)|async move{stream.next().await.map(|chunk|(chunk,(stream,permit)))});
+  let mut response=Response::new(Body::from_stream(stream));
+  response.headers_mut().insert(header::CONTENT_TYPE,header::HeaderValue::from_static("application/octet-stream"));
+  response.headers_mut().insert(header::CONTENT_LENGTH,header::HeaderValue::from(file.size));
+  response.headers_mut().insert(header::CONTENT_DISPOSITION,header::HeaderValue::from_static("attachment"));response
+ },Err(e)=>failure(e)}
+}
+async fn delete(State(host):State<Host>,Path(id):Path<String>,request:Request)->Response {
+ let result=async move {let p=principal(&host,bearer(&request)).await?;host.files.delete(p.as_ref(),&id).await}.await;
+ match result{Ok(())=>Json(json!({"deleted":true})).into_response(),Err(e)=>failure(e)}
+}
+pub async fn mount(migrate:bool,services:&crate::lenso_host::Services)->Result<crate::lenso_host::Mounted,Box<dyn std::error::Error>> {
+ let identity=services.identity.clone().ok_or("Files requires an application identity provider")?;
+ {% if store.module == "postgres" %}let url=std::env::var({{ store.configuration.connection.env|rust_string }})?;let metadata=Store::connect(&url,"files").await?;{% else %}let metadata=Store::open(std::path::Path::new({{ store.configuration.path|rust_string }}),"files")?;{% endif %}
+ if migrate{metadata.migrate().await?;}metadata.check_schema().await?;
+ let blobs=local::LocalBlobs::open(std::path::Path::new({{ resolution.instances[resolution.instances.files.bindings.content].configuration.directory|rust_string }}),"files")?;
+ let host=Host{files:Arc::new(files::Files::new(metadata,blobs,{{ resolution.instances.files.configuration.max_bytes }})?),identity,permits:Arc::new(tokio::sync::Semaphore::new(8))};
+ let router=Router::new().route("/files",post(upload).get(list)).route("/files/{id}",get(stat).delete(delete)).route("/files/{id}/content",get(download)).with_state(host)
+  .layer(axum::middleware::map_response(|mut r:Response|async move{r.headers_mut().insert(header::CACHE_CONTROL,header::HeaderValue::from_static("no-store"));r.headers_mut().insert("x-content-type-options",header::HeaderValue::from_static("nosniff"));r}));
+ Ok(crate::lenso_host::Mounted{router,identity:None})
+}

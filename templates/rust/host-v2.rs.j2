@@ -1,0 +1,174 @@
+use axum::{
+    Json, Router,
+    body::to_bytes,
+    extract::{Request, State},
+    http::{StatusCode, header},
+    response::{IntoResponse, Response},
+};
+use lenso_app::{ActionError, CallRecord, CancellationToken, Context, ErrorCode, Executor};
+#[path="mod.rs"]
+pub mod assembly;
+use assembly::{AuthApplication,auth::random_hex,i_61757468};
+{% set provider = resolution.instances[resolution.instances.auth.bindings.store] %}
+{% if provider.module == "postgres" %}type Store=assembly::postgres::PostgresAuthStore;{% else %}type Store=assembly::sqlite::SqliteAuthStore;{% endif %}
+use serde_json::{Value, json};
+use std::sync::Arc;
+#[derive(Clone)]
+struct Host {
+    app: Arc<AuthApplication<Store>>,
+    permits: Arc<tokio::sync::Semaphore>,
+}
+struct HttpFailure(StatusCode, Value);
+impl From<(StatusCode, Json<Value>)> for HttpFailure {
+    fn from((status, Json(body)): (StatusCode, Json<Value>)) -> Self {
+        Self(status, body)
+    }
+}
+impl IntoResponse for HttpFailure {
+    fn into_response(self) -> Response {
+        (self.0, Json(self.1)).into_response()
+    }
+}
+fn failure(error: ActionError) -> HttpFailure {
+    let status = match error.code() {
+        ErrorCode::InvalidInput => StatusCode::BAD_REQUEST,
+        ErrorCode::Unauthenticated => StatusCode::UNAUTHORIZED,
+        ErrorCode::Forbidden => StatusCode::FORBIDDEN,
+        ErrorCode::Conflict => StatusCode::CONFLICT,
+        ErrorCode::NotFound => StatusCode::NOT_FOUND,
+        _ => StatusCode::INTERNAL_SERVER_ERROR,
+    };
+    let message = if error.code() == ErrorCode::Internal {
+        "Authentication operation failed"
+    } else {
+        error.message()
+    };
+    (
+        status,
+        Json(json!({"code":error.code().as_str(),"message":message})),
+    )
+        .into()
+}
+async fn operation(host: Host, request: Request) -> Result<Value, HttpFailure> {
+    let route = format!("{} {}", request.method(), request.uri().path());
+    if !matches!(
+        route.as_str(),
+        "POST /auth/register" | "POST /auth/login" | "POST /auth/logout" | "GET /auth/session"
+    ) {
+        return Err((StatusCode::NOT_FOUND, Json(json!({"code":"not_found"}))).into());
+    }
+    let token = request
+        .headers()
+        .get(header::AUTHORIZATION)
+        .and_then(|v| v.to_str().ok())
+        .and_then(|v| v.strip_prefix("Bearer "))
+        .map(str::to_owned);
+    let resources = host.app.resources.clone();
+    let context = Context {
+        call_id: random_hex(16).map_err(failure)?,
+        principal: resources
+            .principal(token.as_deref())
+            .await
+            .map_err(failure)?,
+        resources,
+        cancellation: CancellationToken::new(),
+    };
+    let input = if matches!(route.as_str(), "POST /auth/register" | "POST /auth/login") {
+        if request
+            .headers()
+            .get(header::CONTENT_TYPE)
+            .and_then(|v| v.to_str().ok())
+            .and_then(|v| v.split(';').next())
+            != Some("application/json")
+        {
+            return Err((
+                StatusCode::UNSUPPORTED_MEDIA_TYPE,
+                Json(json!({"code":"invalid_input"})),
+            )
+                .into());
+        }
+        let body = tokio::time::timeout(
+            std::time::Duration::from_secs(10),
+            to_bytes(request.into_body(), 4096),
+        )
+        .await
+        .map_err(|_| -> HttpFailure {
+            (
+                StatusCode::REQUEST_TIMEOUT,
+                Json(json!({"code":"invalid_input"})),
+            )
+                .into()
+        })?
+        .map_err(|_| -> HttpFailure {
+            (
+                StatusCode::PAYLOAD_TOO_LARGE,
+                Json(json!({"code":"invalid_input"})),
+            )
+                .into()
+        })?;
+        serde_json::from_slice(&body).map_err(|_| -> HttpFailure {
+            (
+                StatusCode::BAD_REQUEST,
+                Json(json!({"code":"invalid_input"})),
+            )
+                .into()
+        })?
+    } else {
+        Value::Null
+    };
+    let executor = Executor::new(|_: CallRecord| {});
+    let a = &host.app.actions;
+    let result = match route.as_str() {
+        "POST /auth/register" => executor.call_json(&a.register, &context, input).await,
+        "POST /auth/login" => executor.call_json(&a.login, &context, input).await,
+        "POST /auth/logout" => {
+            executor
+                .call_json(
+                    &a.logout,
+                    &context,
+                    json!({"token":token.unwrap_or_default()}),
+                )
+                .await
+        }
+        _ => executor.call_json(&a.session, &context, Value::Null).await,
+    };
+    result.map_err(failure)
+}
+async fn handle(State(host): State<Host>, request: Request) -> Response {
+    let Ok(_permit) = host.permits.clone().try_acquire_owned() else {
+        return (
+            StatusCode::TOO_MANY_REQUESTS,
+            Json(json!({"code":"capacity"})),
+        )
+            .into_response();
+    };
+    let mut response = match operation(host, request).await {
+        Ok(value) => Json(value).into_response(),
+        Err(response) => response.into_response(),
+    };
+    response.headers_mut().insert(
+        header::CACHE_CONTROL,
+        header::HeaderValue::from_static("no-store"),
+    );
+    response
+}
+
+struct ApplicationIdentity(Arc<AuthApplication<Store>>);
+impl crate::lenso_host::Identity for ApplicationIdentity {
+    fn resolve<'a>(&'a self, token:Option<&'a str>)->std::pin::Pin<Box<dyn std::future::Future<Output=crate::lenso_host::IdentityResult>+Send+'a>> {
+        Box::pin(async move { Ok(self.0.resources.principal(token).await?.map(|p| crate::lenso_host::Principal{subject:p.subject,scopes:p.scopes})) })
+    }
+}
+pub async fn mount(migrate:bool,_services:&crate::lenso_host::Services)->Result<crate::lenso_host::Mounted,Box<dyn std::error::Error>> {
+    {% if provider.module == "postgres" %}let app=i_61757468(None).await?;{% else %}let app=i_61757468(None)?;{% endif %}
+    if migrate {app.store.migrate().await?;}
+    app.store.check_schema().await?;
+    let app=Arc::new(app);
+    let router=Router::new()
+        .route("/auth/register", axum::routing::post(handle))
+        .route("/auth/login", axum::routing::post(handle))
+        .route("/auth/logout", axum::routing::post(handle))
+        .route("/auth/session", axum::routing::get(handle))
+        .with_state(Host{app:app.clone(),permits:Arc::new(tokio::sync::Semaphore::new(4))});
+    Ok(crate::lenso_host::Mounted{router,identity:Some(Arc::new(ApplicationIdentity(app)))})
+}

@@ -11,6 +11,14 @@ curated names/presets in [lenso-registry](https://github.com/LioRael/lenso-regis
 No SDK changes are required. Source consumers use `@lenso/app` / `lenso-app` 0.1.1
 from npm/crates.io, not workspace path dependencies.
 
+## Files development
+
+The Files branch adds private streaming file management in TypeScript/Rust, with
+SQLite/PostgreSQL metadata and local content. App 0.2.0 supplies shared identity
+and streaming host protocol v2; Auth supplies the identity resolver. These versions
+are prepared for the next module source release and are not yet public aliases.
+See [Files behavior, variants and acceptance](docs/files.md).
+
 ## Create a native application
 
 App 0.1.0 and Code 0.3.6 add a native host before installing Auth:

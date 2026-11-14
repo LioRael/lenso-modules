@@ -1,0 +1,51 @@
+import { Files } from "../modules/files/core.js";
+import { LocalBlobs } from "../modules/local/local.js";
+{% set store = resolution.instances[resolution.instances.files.bindings.metadata] %}
+{% if store.module == "postgres" %}import { PostgresFiles } from "../modules/postgres/store.js";
+{% else %}import { SqliteFiles } from "../modules/sqlite/store.js";{% endif %}
+import { ActionError } from "@lenso/app";
+interface Principal {subject:string;scopes:readonly string[]}
+interface Services {identity?: {resolve(token:string|undefined):Promise<Principal|undefined>}}
+interface Request {method:string;path:string;url:URL;authorization:string|undefined;source:AsyncIterable<Uint8Array>;signal:AbortSignal}
+export async function mount(migrate:boolean, services:Services) {
+  const identity=services.identity;
+  if (!identity) throw new Error("Files requires an application identity provider");
+{% if store.module == "postgres" %}
+  const url=process.env[{{ store.configuration.connection.env|tojson }}];
+  if (!url) throw new Error("Missing Files database environment binding");
+  const metadata=new PostgresFiles(url);
+{% else %}
+  const metadata=new SqliteFiles({{ store.configuration.path|tojson }});
+{% endif %}
+  try {
+    if (migrate) await metadata.migrate(); await metadata.checkSchema();
+    const blobs=await LocalBlobs.open({{ resolution.instances[resolution.instances.files.bindings.content].configuration.directory|tojson }});
+    const files=new Files(metadata,blobs,{{ resolution.instances.files.configuration.max_bytes }});
+    let active=0;
+    return {
+      close:()=>metadata.close(),
+      handleStream:async (request:Request) => {
+        if (request.path!=="/files" && !request.path.startsWith("/files/")) return undefined;
+        if (active>=8) return {status:429,body:{code:"capacity"}};
+        active++;
+        try {
+          const principal=await identity.resolve(request.authorization?.startsWith("Bearer ") ? request.authorization.slice(7) : undefined);
+          const id=request.path.split("/")[2] ?? "";
+          if (request.path==="/files" && request.method==="POST") return {status:201,body:await files.upload(principal,request.url.searchParams.get("name") ?? "",request.source,request.signal)};
+          if (request.path==="/files" && request.method==="GET") return {status:200,body:{files:await files.list(principal,request.url.searchParams.get("after") ?? "",Number(request.url.searchParams.get("limit") ?? 20))}};
+          if (request.path===`/files/${id}/content` && request.method==="GET") {
+            const {file,source}=await files.download(principal,id);
+            return {status:200,stream:source,headers:{"Content-Length":String(file.size),"Content-Disposition":"attachment"}};
+          }
+          if (request.path===`/files/${id}` && request.method==="GET") return {status:200,body:await files.stat(principal,id)};
+          if (request.path===`/files/${id}` && request.method==="DELETE") {await files.delete(principal,id);return {status:200,body:{deleted:true}};}
+          return {status:404,body:{code:"not_found"}};
+        } catch (cause) {
+          const error=cause instanceof ActionError ? cause : new ActionError("internal","File operation failed");
+          const status={invalid_input:400,unauthenticated:401,forbidden:403,not_found:404,conflict:409,cancelled:499,internal:500}[error.code];
+          return {status,body:{code:error.code,message:error.code==="internal" ? "File operation failed" : error.message}};
+        } finally {active--;}
+      },
+    };
+  } catch (error) {await metadata.close();throw error;}
+}

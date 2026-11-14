@@ -103,3 +103,9 @@ for language in ('typescript','rust'):
             text+='\n[[generator.dependencies]]\necosystem="cargo"\npackage="'+name+'"\nversion="'+version+'"\nmodule="auth"\noptions={}\n'
     tomllib.loads(text)
     (root/f'auth.{language}.app.toml').write_text(text)
+
+    modern=text.replace('lenso-http-v1','lenso-http-v2').replace('host.'+('ts' if language=='typescript' else 'rs')+'.j2','host-v2.'+('ts' if language=='typescript' else 'rs')+'.j2')
+    modern=modern.replace('files = [','files = [{scope="composition",template="templates/host-v2.toml.j2",target="host.toml"}, ',1)
+    modern=modern.replace('"macros","net","rt","rt-multi-thread","signal","sync","time"','"fs","io-util","macros","net","rt","rt-multi-thread","signal","sync","time"')
+    tomllib.loads(modern)
+    (root/f'auth.{language}.app-v2.toml').write_text(modern)
