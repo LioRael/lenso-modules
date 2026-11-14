@@ -28,7 +28,7 @@ export async function mount(migrate: boolean) {
       } catch (cause) {
         const error = cause instanceof ActionError ? cause : new ActionError("internal", "Authentication operation failed", { cause });
         const status = { invalid_input: 400, unauthenticated: 401, forbidden: 403, conflict: 409, not_found: 404, cancelled: 499, internal: 500 }[error.code];
-        return { status, body: { code: error.code, message: error.code === "internal" ? "Authentication operation failed" : error.message } };
+        return { status, body: (error.code === "internal" ? new ActionError("internal", "Authentication operation failed") : error).toJSON() };
       } finally { active--; }
     },
   };

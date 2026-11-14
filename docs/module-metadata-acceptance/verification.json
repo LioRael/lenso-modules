@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "sdk_commit": "9d5edceb8d206b46b2c337ff77caebdc9927f8a8",
+  "platform": {
+    "system": "Darwin",
+    "machine": "arm64",
+    "node": "v26.10.0",
+    "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+  },
+  "checks": [
+    "typescript",
+    "lint",
+    "rust-check",
+    "rust-tests",
+    "rust-clippy",
+    "rust-doc",
+    "rust-format",
+    "integration"
+  ],
+  "postgres_executed": true,
+  "shared_contract": "TS/Rust reports match except runtime"
+}

@@ -33,7 +33,7 @@ const server = createServer(async (request, response) => {
         chunks.push(chunk);
       }
       try { input = JSON.parse(Buffer.concat(chunks).toString("utf8")); }
-      catch { send(400, { code: "invalid_input" }); return; }
+      catch (cause) { throw new ActionError("invalid_input", "Invalid JSON", { cause, issues: [{ path: [], code: "invalid_format" }] }); }
     } else { request.resume(); }
     let result: unknown;
     switch (route) {
@@ -46,7 +46,7 @@ const server = createServer(async (request, response) => {
   } catch (cause) {
     const error = cause instanceof ActionError ? cause : new ActionError("internal", "Authentication operation failed", { cause });
     const status = { invalid_input: 400, unauthenticated: 401, forbidden: 403, conflict: 409, not_found: 404, cancelled: 499, internal: 500 }[error.code];
-    send(status, { code: error.code, message: error.code === "internal" ? "Authentication operation failed" : error.message });
+    send(status, (error.code === "internal" ? new ActionError("internal", "Authentication operation failed") : error).toJSON());
   } finally { active--; }
 });
 server.requestTimeout = 10_000;

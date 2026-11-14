@@ -7,7 +7,7 @@ for lang in ('typescript','rust'):
     ext='ts' if lang=='typescript' else 'rs'
     runtime='node26' if lang=='typescript' else 'tokio'
     prefix='typescript/src' if lang=='typescript' else 'rust/src'
-    modules={'auth':['core.ts','contracts.ts'] if lang=='typescript' else ['mod.rs'],
+    modules={'auth':['core.ts','contracts.ts','metadata.json'] if lang=='typescript' else ['mod.rs','metadata.json'],
              'sqlite':['store.ts','schema.ts'] if lang=='typescript' else ['mod.rs','schema.sql'],
              'postgres':['store.ts','schema.ts'] if lang=='typescript' else ['mod.rs','schema.sql'],
              'scrypt':['hasher.ts'] if lang=='typescript' else ['mod.rs']}
@@ -109,3 +109,6 @@ for language in ('typescript','rust'):
     modern=modern.replace('"macros","net","rt","rt-multi-thread","signal","sync","time"','"fs","io-util","macros","net","rt","rt-multi-thread","signal","sync","time"')
     tomllib.loads(modern)
     (root/f'auth.{language}.app-v2.toml').write_text(modern)
+
+for lang in ("typescript", "rust"):
+    (root/lang/"src/modules/auth/metadata.json").write_text((root/"contracts/auth/metadata.json").read_text())

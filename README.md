@@ -11,6 +11,10 @@ curated names/presets in [lenso-registry](https://github.com/LioRael/lenso-regis
 No SDK changes are required. Source consumers use `@lenso/app` / `lenso-app` 0.1.1
 from npm/crates.io, not workspace path dependencies.
 
+## Unreleased SDK metadata source
+
+The working source adds [optional Auth/Files SDK descriptions and input issues](docs/module-metadata.md). It requires the reviewed SDK metadata APIs, which are not in published SDK 0.1.1. Use the isolated verification script in that guide for this batch; the published installation instructions below refer to existing release tags. Release dependencies/catalog versions stay unchanged until a compatible SDK is published. [Local acceptance](docs/module-metadata-acceptance.md) covers both native languages and real HTTP streaming.
+
 ## Private Files
 
 Files 0.1.0 is published with Auth 0.4.0 in module source v0.4.0. App 0.2.0

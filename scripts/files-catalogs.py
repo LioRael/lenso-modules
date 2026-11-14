@@ -43,7 +43,7 @@ kind={{type="text"}}
 default="data/files"
 [resources]
 '''
- resources={'files':['core.ts'],'local':['local.ts'],'sqlite':['sqlite.ts','sqlite-schema.ts'],'postgres':['postgres.ts','postgres-schema.ts']} if lang=='typescript' else {'files':['mod.rs'],'local':['local.rs'],'sqlite':['sqlite.rs','sqlite.sql'],'postgres':['postgres.rs','postgres.sql']}
+ resources={'files':['core.ts','metadata.json'],'local':['local.ts'],'sqlite':['sqlite.ts','sqlite-schema.ts'],'postgres':['postgres.ts','postgres-schema.ts']} if lang=='typescript' else {'files':['mod.rs','metadata.json'],'local':['local.rs'],'sqlite':['sqlite.rs','sqlite.sql'],'postgres':['postgres.rs','postgres.sql']}
  for module,files in resources.items():
   entries=[]
   for name in files:
@@ -74,3 +74,6 @@ for db in ['sqlite','postgres']:
  schema=(root/f'contracts/files/{db}-v1.sql').read_text()
  (root/f'typescript/src/modules/files/{db}-schema.ts').write_text('export const schema = '+json.dumps(schema)+';\n')
  (root/f'rust/src/modules/files/{db}.sql').write_text(schema)
+
+for lang in ("typescript", "rust"):
+ (root/lang/"src/modules/files/metadata.json").write_text((root/"contracts/files/metadata.json").read_text())

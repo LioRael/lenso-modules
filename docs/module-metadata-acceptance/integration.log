@@ -1,0 +1,16 @@
+npm warn Unknown user config "home". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm notice run test:integration
+npm notice run node --test tests/*.test.mjs
+✔ typescript HTTP lifecycle, authorization and body limits (1065.432958ms)
+✔ rust HTTP lifecycle, authorization and body limits (41657.005625ms)
+✔ TS/Rust reopen the same SQLite accounts and sessions and enforce concurrent uniqueness (17291.566583ms)
+✔ typescript: SDK descriptions, safe input issues and real Auth/Files streams (897.399083ms)
+✔ rust: SDK descriptions, safe input issues and real Auth/Files streams (33554.482875ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 60061.093375

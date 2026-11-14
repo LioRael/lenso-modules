@@ -21,6 +21,7 @@ tokio-postgres = "0.7"
 postgres-native-tls = "0.5"
 native-tls = "0.2"
 
+futures-util = "0.3"
 cap-std = "4"
 tokio-util = {version="0.7",features=["io"]}
 

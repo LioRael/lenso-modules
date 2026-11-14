@@ -1,0 +1,246 @@
+{
+  "module": {
+    "description": "Private files with native streaming content",
+    "capabilities": [
+      "lenso.files-metadata",
+      "lenso.blob-store"
+    ]
+  },
+  "actions": {
+    "upload": {
+      "description": "Upload a native byte stream; source is transport-owned and has no JSON representation",
+      "capabilities": [
+        "lenso.files-metadata",
+        "lenso.blob-store"
+      ],
+      "effects": [
+        "write:files.metadata",
+        "write:files.content"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Display filename, at most 255 UTF-8 bytes; no separators or control characters"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "File identifier",
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "owner": {
+            "type": "string",
+            "description": "Trusted owner identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display filename"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sha256": {
+            "type": "string",
+            "description": "Content digest"
+          },
+          "created_ms": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "owner",
+          "name",
+          "size",
+          "sha256",
+          "created_ms"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "list": {
+      "description": "List the authenticated owner's files",
+      "capabilities": [
+        "lenso.files-metadata"
+      ],
+      "effects": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "after": {
+            "type": "string",
+            "description": "Exclusive file cursor; empty starts a page"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "File identifier",
+              "pattern": "^[a-f0-9]{32}$"
+            },
+            "owner": {
+              "type": "string",
+              "description": "Trusted owner identifier"
+            },
+            "name": {
+              "type": "string",
+              "description": "Display filename"
+            },
+            "size": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "sha256": {
+              "type": "string",
+              "description": "Content digest"
+            },
+            "created_ms": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "id",
+            "owner",
+            "name",
+            "size",
+            "sha256",
+            "created_ms"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "stat": {
+      "description": "Read owned file metadata",
+      "capabilities": [
+        "lenso.files-metadata"
+      ],
+      "effects": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Owned file identifier",
+            "pattern": "^[a-f0-9]{32}$"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "File identifier",
+            "pattern": "^[a-f0-9]{32}$"
+          },
+          "owner": {
+            "type": "string",
+            "description": "Trusted owner identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display filename"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sha256": {
+            "type": "string",
+            "description": "Content digest"
+          },
+          "created_ms": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "owner",
+          "name",
+          "size",
+          "sha256",
+          "created_ms"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "download": {
+      "description": "Read owned file metadata and a native content stream; no JSON output representation",
+      "capabilities": [
+        "lenso.files-metadata",
+        "lenso.blob-store"
+      ],
+      "effects": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Owned file identifier",
+            "pattern": "^[a-f0-9]{32}$"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "delete": {
+      "description": "Delete an owned file",
+      "capabilities": [
+        "lenso.files-metadata",
+        "lenso.blob-store"
+      ],
+      "effects": [
+        "write:files.metadata",
+        "write:files.content"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Owned file identifier",
+            "pattern": "^[a-f0-9]{32}$"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "null"
+      }
+    }
+  }
+}

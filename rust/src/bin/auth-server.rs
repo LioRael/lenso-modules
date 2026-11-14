@@ -34,14 +34,14 @@ fn failure(error: ActionError) -> HttpFailure {
         ErrorCode::NotFound => StatusCode::NOT_FOUND,
         _ => StatusCode::INTERNAL_SERVER_ERROR,
     };
-    let message = if error.code() == ErrorCode::Internal {
-        "Authentication operation failed"
+    let public = if error.code() == ErrorCode::Internal {
+        ActionError::new(ErrorCode::Internal, "Authentication operation failed")
     } else {
-        error.message()
+        error
     };
     (
         status,
-        Json(json!({"code":error.code().as_str(),"message":message})),
+        Json(serde_json::to_value(public.public()).expect("public error serializes")),
     )
         .into()
 }
@@ -102,12 +102,15 @@ async fn operation(host: Host, request: Request) -> Result<Value, HttpFailure> {
             )
                 .into()
         })?;
-        serde_json::from_slice(&body).map_err(|_| -> HttpFailure {
-            (
-                StatusCode::BAD_REQUEST,
-                Json(json!({"code":"invalid_input"})),
+        serde_json::from_slice(&body).map_err(|cause| {
+            failure(
+                ActionError::new(ErrorCode::InvalidInput, "Invalid JSON")
+                    .with_source(cause)
+                    .with_issues(vec![lenso_app::InputIssue {
+                        path: vec![],
+                        code: lenso_app::InputIssueCode::InvalidFormat,
+                    }]),
             )
-                .into()
         })?
     } else {
         Value::Null

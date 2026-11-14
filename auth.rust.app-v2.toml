@@ -36,7 +36,7 @@ version = "0.3.0"
 [modules.scrypt.provides."lenso.password-hasher"]
 version = "0.1.0"
 [resources]
-auth = [{ path = "rust/src/modules/auth/mod.rs", target = "mod.rs" }]
+auth = [{ path = "rust/src/modules/auth/mod.rs", target = "mod.rs" }, { path = "rust/src/modules/auth/metadata.json", target = "metadata.json" }]
 sqlite = [{ path = "rust/src/modules/sqlite/mod.rs", target = "mod.rs" }, { path = "rust/src/modules/sqlite/schema.sql", target = "schema.sql" }]
 postgres = [{ path = "rust/src/modules/postgres/mod.rs", target = "mod.rs" }, { path = "rust/src/modules/postgres/schema.sql", target = "schema.sql" }]
 scrypt = [{ path = "rust/src/modules/scrypt/mod.rs", target = "mod.rs" }]
