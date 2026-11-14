@@ -9,6 +9,7 @@ import tomllib
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--root", type=Path, required=True)
+parser.add_argument("--language", choices=["typescript", "rust"], required=True)
 parser.add_argument("--output", type=Path, required=True)
 args = parser.parse_args()
 consumers = []
@@ -31,7 +32,10 @@ for suite in ("consumers", "apps", "files", "files-upgrade"):
                 if package["name"] == "lenso-app":
                     assert package["source"].startswith("registry+") and package["checksum"], package
                     consumers.append({"project": str(project.relative_to(args.root)), "ecosystem": "crates.io", "sdk_version": package["version"], "registry": package["source"]})
-assert consumers, "No installed SDK consumers found"
+expected = {f"consumers/{args.language}-{storage}" for storage in ("sqlite", "postgres")}
+expected |= {f"{suite}/{args.language}-{storage}/app" for suite in ("apps", "files", "files-upgrade") for storage in ("sqlite", "postgres")}
+actual = {item["project"] for item in consumers}
+assert actual == expected and len(consumers) == len(expected), {"missing": sorted(expected - actual), "unexpected": sorted(actual - expected), "consumer_count": len(consumers)}
 assert all(tuple(map(int, item["sdk_version"].split("."))) >= (0, 1, 2) for item in consumers), consumers
 report = {"schema_version": 1, "status": "passed", "repository": os.environ.get("GITHUB_REPOSITORY"), "run_id": os.environ.get("GITHUB_RUN_ID"), "checkout_sha": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(), "platform": {"system": platform.system(), "machine": platform.machine(), "node": subprocess.check_output(["node", "--version"], text=True).strip(), "rust": subprocess.check_output(["rustc", "--version"], text=True).strip()}, "consumers": consumers}
 args.output.write_text(json.dumps(report, indent=2) + "\n")

@@ -80,7 +80,7 @@ jobs:
           curl -fsSL --retry 2 https://github.com/LioRael/lenso-cli/releases/download/app-v0.1.0/lenso-app-0.1.0.tar.gz -o "$RUNNER_TEMP/legacy-app.tar.gz"
           tar -xzf "$RUNNER_TEMP/legacy-app.tar.gz" -C "$RUNNER_TEMP/legacy-app"
           python3 dist/cli-source/scripts/verify-files.py --binary "$RUNNER_TEMP/bin/lenso" \
-            --modules "$GITHUB_WORKSPACE" --language "$LANGUAGE" --legacy-app "$RUNNER_TEMP/legacy-app" --out "$RUNNER_TEMP/files-upgrade"
+            --modules "$GITHUB_WORKSPACE" --language "$LANGUAGE" --storage both --legacy-app "$RUNNER_TEMP/legacy-app" --out "$RUNNER_TEMP/files-upgrade"
       - name: Verify official Files installations and old-version upgrades
         if: github.event_name != 'pull_request'
         env:
@@ -92,7 +92,7 @@ jobs:
           python3 dist/cli-source/scripts/verify-files.py --binary "$RUNNER_TEMP/bin/lenso" \
             --official --token-env GITHUB_TOKEN --language "$LANGUAGE" --storage both --upgrade --out "$RUNNER_TEMP/files-upgrade"
       - name: Record installed registry SDK versions
-        run: python3 scripts/record-sdk-consumers.py --root "$RUNNER_TEMP" --output "$RUNNER_TEMP/sdk-consumers.json"
+        run: python3 scripts/record-sdk-consumers.py --root "$RUNNER_TEMP" --language "${{ matrix.language }}" --output "$RUNNER_TEMP/sdk-consumers.json"
       - name: Stop disposable PostgreSQL
         if: always()
         run: |
