@@ -1,0 +1,64 @@
+.github/workflows/verify-module-install.yml
+  s_0a36fa17311984::t_86e563c984b616 94-95,109
+  s_0a36fa17311984::t_d51031b32403a6 18,24,37-38,96-103,105,107
+files.rust.toml
+  s_0a36fa17311984::t_3978b6bf062cf4 60
+auth.rust.app.toml
+  s_0a36fa17311984::t_3978b6bf062cf4 59,70-75
+  s_0a36fa17311984::t_77cb80362bfab8 76
+auth.rust.toml
+  s_0a36fa17311984::t_3978b6bf062cf4 62,73-78
+  s_0a36fa17311984::t_d2ed6c027e3446 79
+scripts/record-sdk-consumers.py
+  s_0a36fa17311984::t_86e563c984b616 1-38
+auth.typescript.toml
+  s_0a36fa17311984::t_3978b6bf062cf4 62
+rust/Cargo.toml
+  s_0a36fa17311984::t_3978b6bf062cf4 10
+.github/workflows/check.yml
+  s_0a36fa17311984::t_d51031b32403a6 7-11,23-27,39-43,52-65
+auth.typescript.app-v2.toml
+  s_0a36fa17311984::t_3978b6bf062cf4 59
+scripts/files-catalogs.py
+  s_0a36fa17311984::t_3978b6bf062cf4 66-67
+auth.typescript.app.toml
+  s_0a36fa17311984::t_3978b6bf062cf4 59
+scripts/ci-postgres.sh
+  s_0a36fa17311984::t_d51031b32403a6 1-22
+scripts/catalogs.py
+  s_0a36fa17311984::t_dbdcce92ba2cc6 102
+  s_0a36fa17311984::t_3978b6bf062cf4 72-73
+files.typescript.toml
+  s_0a36fa17311984::t_3978b6bf062cf4 60
+scripts/verify-sdk-metadata.py
+  s_0a36fa17311984::t_3978b6bf062cf4 1,11,35-36,41,43,48,52
+typescript/package.json
+  s_0a36fa17311984::t_3978b6bf062cf4 11
+auth.rust.app-v2.toml
+  s_0a36fa17311984::t_3978b6bf062cf4 59,70-75
+  s_0a36fa17311984::t_a56d7aba36db82 76
+README.md
+  s_0a36fa17311984::t_8d80398448ddf9 11,16
+docs/module-metadata.md
+  s_0a36fa17311984::t_c1084f2247565f 3,37,39,42,45,47,49
+package-lock.json
+  s_0a36fa17311984::t_7a4c2a1b23cb32 22-24,625
+rust/Cargo.lock
+  s_0a36fa17311984::t_3a96c8e92c4f5c 657,659,663
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ef2f082689fd1cadcf71a241ac3e8c5fe2544c3c",
+  "prompts": {},
+  "sessions": {
+    "s_0a36fa17311984": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1daa8-3fb7-7c03-beac-1e3b4a74162a",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "LioRael <leo@lenso.dev>"
+    }
+  }
+}
