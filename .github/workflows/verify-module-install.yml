@@ -16,7 +16,7 @@ permissions:
 jobs:
   install:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           repository: LioRael/lenso-cli
-          ref: 968148899ef496f9e7e81b0e1d5825580b24356a
+          ref: c78821993df005f0f46c0e2a81bfb75d5907cf66
           path: dist/cli-source
           persist-credentials: false
       - uses: actions/setup-node@v4
@@ -91,6 +91,17 @@ jobs:
           tar -xzf "$RUNNER_TEMP/legacy-app.tar.gz" -C "$RUNNER_TEMP/legacy-app"
           python3 dist/cli-source/scripts/verify-files.py --binary "$RUNNER_TEMP/bin/lenso" \
             --modules "$GITHUB_WORKSPACE" --language "$LANGUAGE" --legacy-app "$RUNNER_TEMP/legacy-app" --out "$RUNNER_TEMP/files-upgrade"
+      - name: Verify official Files installations and old-version upgrades
+        if: github.event_name != 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          LANGUAGE: ${{ matrix.language }}
+          DATABASE_URL: postgresql://lenso:test-only-password@127.0.0.1:${{ job.services.postgres.ports[5432] }}/modules?sslmode=disable
+        run: |
+          python3 dist/cli-source/scripts/verify-files.py --binary "$RUNNER_TEMP/bin/lenso" \
+            --official --token-env GITHUB_TOKEN --language "$LANGUAGE" --storage both --out "$RUNNER_TEMP/files"
+          python3 dist/cli-source/scripts/verify-files.py --binary "$RUNNER_TEMP/bin/lenso" \
+            --official --token-env GITHUB_TOKEN --language "$LANGUAGE" --storage both --upgrade --out "$RUNNER_TEMP/files-upgrade"
       - uses: actions/upload-artifact@v7
         with:
           name: code-module-consumers-${{ matrix.language }}

@@ -1,7 +1,7 @@
 # Lenso Modules
 
 Editable functional modules built on the published Lenso SDKs. The first module is
-**Auth 0.3.0**: password registration/login and opaque sessions, with independent
+**Auth 0.4.0**: password registration/login and opaque sessions, with independent
 TypeScript and Rust implementations, SQLite/PostgreSQL stores and a bounded scrypt provider.
 
 This repository owns business interfaces, implementations, adapters, templates and
@@ -11,17 +11,35 @@ curated names/presets in [lenso-registry](https://github.com/LioRael/lenso-regis
 No SDK changes are required. Source consumers use `@lenso/app` / `lenso-app` 0.1.1
 from npm/crates.io, not workspace path dependencies.
 
-## Files development
+## Private Files
 
-The Files branch adds private streaming file management in TypeScript/Rust, with
-SQLite/PostgreSQL metadata and local content. App 0.2.0 supplies shared identity
-and streaming host protocol v2; Auth supplies the identity resolver. These versions
-are prepared for the next module source release and are not yet public aliases.
-See [Files behavior, variants and acceptance](docs/files.md).
+Files 0.1.0 is published with Auth 0.4.0 in module source v0.4.0. App 0.2.0
+provides the shared identity and native streaming host. Both languages support
+SQLite/PostgreSQL metadata and local content. See
+[Files behavior, variants and acceptance](docs/files.md).
+
+```sh
+lenso new my-api --preset app
+cd my-api
+lenso code config --provider lenso.auth-store=sqlite
+lenso code config --provider lenso.files-metadata=sqlite
+lenso code add auth
+lenso code preview files
+lenso code add files
+lenso app check
+lenso app migrate
+lenso app run
+```
+
+For an existing App 0.1.0 project, refresh its app preset, review/apply
+`app upgrade-preview` / `app upgrade`, then update Auth with
+`code update auth --input '{"reconfigure":true}'`. Existing sessions and user
+changes are retained. Explicit App version constraints must be updated to ^0.2.0.
+Source/provider changes do not move or delete stored database/blob data.
 
 ## Create a native application
 
-App 0.1.0 and Code 0.3.6 add a native host before installing Auth:
+App 0.2.0 and Code 0.3.6 add a native host before installing Auth:
 
 ```sh
 lenso new my-api --preset app
@@ -39,8 +57,8 @@ uses the same workflow with `lenso.auth-store=postgres` and runtime DATABASE_URL
 in the app's `.env`. Preview does not connect to the database. Migrations are
 explicit, and application startup checks the existing schema without modifying it.
 
-App records `app_host="lenso-http-v1"` as a fixed project convention. The directory
-then chooses `auth.typescript.app.toml` or `auth.rust.app.toml`. These add native
+App records `app_host="lenso-http-v2"` as a fixed project convention. The directory
+then chooses `auth.typescript.app-v2.toml` or `auth.rust.app-v2.toml`. These add native
 HTTP transport templates over the same SDK-backed business source. The reusable
 base catalogs remain available without that convention. Initial App transport
 mounts one root instance named `auth`; custom multi-instance hosts use the base
