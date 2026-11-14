@@ -1,0 +1,21 @@
+.github/workflows/verify-module-install.yml
+  s_0a36fa17311984::t_8220e2dcf203ed 83,95
+scripts/record-sdk-consumers.py
+  s_0a36fa17311984::t_c0aa339a0a2f0d 12,35-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f6e35616f92d298f7e6542d21fbc24d3b6e51f3d",
+  "prompts": {},
+  "sessions": {
+    "s_0a36fa17311984": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1daa8-3fb7-7c03-beac-1e3b4a74162a",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "LioRael <leo@lenso.dev>"
+    }
+  }
+}
