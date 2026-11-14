@@ -109,3 +109,7 @@ cover preview, denied changes, owned updates, customization and locked/offline r
 Native unit tests inject failed commits/removals, lost acknowledgements, task
 cancellation and outside-root symlinks. No S3, sharing, organization roles, resumable
 upload, scanning, Console UI or automatic data migration is advertised.
+
+## Unreleased optional SDK descriptions
+
+The source batch adds optional native SDK Actions over the existing streaming Files methods, public field issues and reusable Module metadata. See the [source guide](module-metadata.md) and [acceptance record](module-metadata-acceptance.md). Published installation/upgrade results above describe the released baseline, not a new release of these APIs.

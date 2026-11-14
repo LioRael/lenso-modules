@@ -1,4 +1,4 @@
-import { Files } from "../modules/files/core.js";
+import { Files, filesModule } from "../modules/files/core.js";
 import { LocalBlobs } from "../modules/local/local.js";
 {% set store = resolution.instances[resolution.instances.files.bindings.metadata] %}
 {% if store.module == "postgres" %}import { PostgresFiles } from "../modules/postgres/store.js";
@@ -23,6 +23,7 @@ export async function mount(migrate:boolean, services:Services) {
     const files=new Files(metadata,blobs,{{ resolution.instances.files.configuration.max_bytes }});
     let active=0;
     return {
+      describe:()=>filesModule(files).module.describe(),
       close:()=>metadata.close(),
       handleStream:async (request:Request) => {
         if (request.path!=="/files" && !request.path.startsWith("/files/")) return undefined;
@@ -43,7 +44,7 @@ export async function mount(migrate:boolean, services:Services) {
         } catch (cause) {
           const error=cause instanceof ActionError ? cause : new ActionError("internal","File operation failed");
           const status={invalid_input:400,unauthenticated:401,forbidden:403,not_found:404,conflict:409,cancelled:499,internal:500}[error.code];
-          return {status,body:{code:error.code,message:error.code==="internal" ? "File operation failed" : error.message}};
+          return {status,body:(error.code==="internal" ? new ActionError("internal","File operation failed") : error).toJSON()};
         } finally {active--;}
       },
     };

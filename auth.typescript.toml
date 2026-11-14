@@ -35,7 +35,7 @@ version = "0.3.0"
 [modules.scrypt.provides."lenso.password-hasher"]
 version = "0.1.0"
 [resources]
-auth = [{ path = "typescript/src/modules/auth/core.ts", target = "core.ts" }, { path = "typescript/src/modules/auth/contracts.ts", target = "contracts.ts" }]
+auth = [{ path = "typescript/src/modules/auth/core.ts", target = "core.ts" }, { path = "typescript/src/modules/auth/contracts.ts", target = "contracts.ts" }, { path = "typescript/src/modules/auth/metadata.json", target = "metadata.json" }]
 sqlite = [{ path = "typescript/src/modules/sqlite/store.ts", target = "store.ts" }, { path = "typescript/src/modules/sqlite/schema.ts", target = "schema.ts" }]
 postgres = [{ path = "typescript/src/modules/postgres/store.ts", target = "store.ts" }, { path = "typescript/src/modules/postgres/schema.ts", target = "schema.ts" }]
 scrypt = [{ path = "typescript/src/modules/scrypt/hasher.ts", target = "hasher.ts" }]
@@ -59,7 +59,7 @@ context = {language="typescript", runtime="node26"}
 [[generator.dependencies]]
 ecosystem="npm"
 package="@lenso/app"
-version="0.1.1"
+version="0.1.2"
 module="auth"
 options={}
 

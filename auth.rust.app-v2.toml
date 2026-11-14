@@ -36,7 +36,7 @@ version = "0.3.0"
 [modules.scrypt.provides."lenso.password-hasher"]
 version = "0.1.0"
 [resources]
-auth = [{ path = "rust/src/modules/auth/mod.rs", target = "mod.rs" }]
+auth = [{ path = "rust/src/modules/auth/mod.rs", target = "mod.rs" }, { path = "rust/src/modules/auth/metadata.json", target = "metadata.json" }]
 sqlite = [{ path = "rust/src/modules/sqlite/mod.rs", target = "mod.rs" }, { path = "rust/src/modules/sqlite/schema.sql", target = "schema.sql" }]
 postgres = [{ path = "rust/src/modules/postgres/mod.rs", target = "mod.rs" }, { path = "rust/src/modules/postgres/schema.sql", target = "schema.sql" }]
 scrypt = [{ path = "rust/src/modules/scrypt/mod.rs", target = "mod.rs" }]
@@ -56,7 +56,7 @@ context = {language="rust", runtime="tokio",app_host="lenso-http-v2"}
 [[generator.dependencies]]
 ecosystem="cargo"
 package="lenso-app"
-version="0.1.1"
+version="0.1.2"
 module="auth"
 options={features=["json"]}
 
@@ -66,6 +66,13 @@ package="serde"
 version="1"
 module="auth"
 options={features=["derive"]}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="serde_json"
+version="1"
+module="auth"
+options={}
 
 [[generator.dependencies]]
 ecosystem="cargo"
@@ -155,12 +162,5 @@ options={features=["fs","io-util","macros","net","rt","rt-multi-thread","signal"
 ecosystem="cargo"
 package="axum"
 version="0.8"
-module="auth"
-options={}
-
-[[generator.dependencies]]
-ecosystem="cargo"
-package="serde_json"
-version="1"
 module="auth"
 options={}

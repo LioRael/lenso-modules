@@ -654,12 +654,13 @@ dependencies = [
 
 [[package]]
 name = "lenso-app"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "63e802014be2967ef2f454e3cc2e374b5409600620fa6f878c351481f6b32705"
+checksum = "a96a2c12384ec6997d840e0da2da64501fa63569a2ba0a44e6c35ef2c98a0141"
 dependencies = [
  "serde",
  "serde_json",
+ "serde_path_to_error",
  "tokio-util",
 ]
 
@@ -669,6 +670,7 @@ version = "0.2.0"
 dependencies = [
  "axum",
  "cap-std",
+ "futures-util",
  "getrandom 0.3.4",
  "lenso-app",
  "native-tls",

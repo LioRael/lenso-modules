@@ -8,7 +8,7 @@
     "start": "node dist/server.js"
   },
   "dependencies": {
-    "@lenso/app": "0.1.1",
+    "@lenso/app": "0.1.2",
     "zod": "^4.0.0",
     "pg": "^8.16"
   },

@@ -1,5 +1,8 @@
 //! Password authentication and opaque sessions, independent of storage and hashing providers.
-use lenso_app::{Action, ActionError, Context, ErrorCode, Module, Principal, require_principal};
+use lenso_app::{
+    Action, ActionError, ActionMetadata, Context, ErrorCode, InputIssue, InputIssueCode,
+    InputSegment, Module, ModuleMetadata, Principal, require_principal,
+};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::{
@@ -111,20 +114,40 @@ fn valid_token(token: &str) -> bool {
             .bytes()
             .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
 }
+fn input_issue(field: &str) -> InputIssue {
+    InputIssue {
+        path: vec![InputSegment::Field(field.into())],
+        code: InputIssueCode::InvalidValue,
+    }
+}
+fn metadata(operation: &str) -> ActionMetadata {
+    let declaration: serde_json::Value = serde_json::from_str(include_str!("metadata.json"))
+        .expect("embedded Auth metadata is valid JSON");
+    serde_json::from_value(declaration["actions"][operation].clone())
+        .expect("embedded Auth Action metadata matches SDK")
+}
 fn validate(input: &Credentials) -> Result<(), ActionError> {
+    let mut issues = Vec::new();
     if !(3..=64).contains(&input.name.len())
         || !input
             .name
             .bytes()
             .all(|b| b.is_ascii_alphanumeric() || b"_-".contains(&b))
-        || !(12..=128).contains(&input.password.len())
     {
-        return Err(ActionError::new(
+        issues.push(input_issue("name"));
+    }
+    if !(12..=128).contains(&input.password.len()) {
+        issues.push(input_issue("password"));
+    }
+    if issues.is_empty() {
+        Ok(())
+    } else {
+        Err(ActionError::new(
             ErrorCode::InvalidInput,
             "Use a 3–64 character ASCII username and 12–128 byte password",
-        ));
+        )
+        .with_issues(issues))
     }
-    Ok(())
 }
 /// Explicit native resources; callers own lifecycle and choose the clock.
 #[derive(Clone)]
@@ -236,7 +259,12 @@ impl Actions {
     }
     /// Describes the actual native handles for SDK introspection.
     pub fn describe<S: AuthStore, H: PasswordHasher>(&self, id: &str) -> Module {
-        let mut module = Module::new(id);
+        let declaration: serde_json::Value = serde_json::from_str(include_str!("metadata.json"))
+            .expect("embedded Auth metadata is valid JSON");
+        let mut module = Module::new(id).with_metadata(
+            serde_json::from_value::<ModuleMetadata>(declaration["module"].clone())
+                .expect("embedded Auth Module metadata matches SDK"),
+        );
         module
             .action::<Auth<S, H>, _>(&self.register)
             .action::<Auth<S, H>, _>(&self.login)
@@ -250,6 +278,9 @@ impl Actions {
 impl<S: AuthStore, H: PasswordHasher> Action<Auth<S, H>> for Register {
     type Input = Credentials;
     type Output = User;
+    fn metadata(&self) -> Option<ActionMetadata> {
+        Some(metadata("register"))
+    }
     fn id(&self) -> &str {
         &self.0
     }
@@ -274,6 +305,9 @@ impl<S: AuthStore, H: PasswordHasher> Action<Auth<S, H>> for Register {
 impl<S: AuthStore, H: PasswordHasher> Action<Auth<S, H>> for Login {
     type Input = Credentials;
     type Output = Session;
+    fn metadata(&self) -> Option<ActionMetadata> {
+        Some(metadata("login"))
+    }
     fn id(&self) -> &str {
         &self.0
     }
@@ -312,6 +346,9 @@ impl<S: AuthStore, H: PasswordHasher> Action<Auth<S, H>> for Login {
 impl<S: AuthStore, H: PasswordHasher> Action<Auth<S, H>> for Current {
     type Input = ();
     type Output = User;
+    fn metadata(&self) -> Option<ActionMetadata> {
+        Some(metadata("session"))
+    }
     fn id(&self) -> &str {
         &self.0
     }
@@ -329,12 +366,16 @@ impl<S: AuthStore, H: PasswordHasher> Action<Auth<S, H>> for Current {
 impl<S: AuthStore, H: PasswordHasher> Action<Auth<S, H>> for Logout {
     type Input = TokenInput;
     type Output = Revoked;
+    fn metadata(&self) -> Option<ActionMetadata> {
+        Some(metadata("logout"))
+    }
     fn id(&self) -> &str {
         &self.0
     }
     fn validate_input(&self, input: &TokenInput) -> Result<(), ActionError> {
         if !valid_token(&input.token) {
-            Err(ActionError::new(ErrorCode::InvalidInput, "Invalid token"))
+            Err(ActionError::new(ErrorCode::InvalidInput, "Invalid token")
+                .with_issues(vec![input_issue("token")]))
         } else {
             Ok(())
         }

@@ -1,0 +1,909 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "runtime": "typescript",
+  "platform": {
+    "system": "darwin",
+    "machine": "arm64",
+    "node": "v26.10.0"
+  },
+  "description": {
+    "modules": [
+      {
+        "id": "auth",
+        "actions": [
+          "auth.register",
+          "auth.login",
+          "auth.session",
+          "auth.logout"
+        ],
+        "tasks": [],
+        "events": [],
+        "resources": [
+          "auth.store",
+          "auth.passwords"
+        ],
+        "metadata": {
+          "description": "Password authentication and opaque sessions",
+          "capabilities": [
+            "lenso.auth-store",
+            "lenso.password-hasher"
+          ]
+        },
+        "actionMetadata": {
+          "auth.register": {
+            "description": "Register an account",
+            "capabilities": [
+              "lenso.auth-store",
+              "lenso.password-hasher"
+            ],
+            "effects": [
+              "write:auth.users"
+            ],
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "ASCII account name",
+                  "pattern": "^[A-Za-z0-9_-]{3,64}$"
+                },
+                "password": {
+                  "type": "string",
+                  "description": "Password, 12 to 128 UTF-8 bytes",
+                  "writeOnly": true
+                }
+              },
+              "required": [
+                "name",
+                "password"
+              ],
+              "additionalProperties": false
+            },
+            "outputSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Account identifier"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Normalized account name"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "auth.login": {
+            "description": "Verify credentials and create a session",
+            "capabilities": [
+              "lenso.auth-store",
+              "lenso.password-hasher"
+            ],
+            "effects": [
+              "write:auth.sessions"
+            ],
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "ASCII account name",
+                  "pattern": "^[A-Za-z0-9_-]{3,64}$"
+                },
+                "password": {
+                  "type": "string",
+                  "description": "Password, 12 to 128 UTF-8 bytes",
+                  "writeOnly": true
+                }
+              },
+              "required": [
+                "name",
+                "password"
+              ],
+              "additionalProperties": false
+            },
+            "outputSchema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "description": "Sensitive bearer token returned only on login"
+                },
+                "expiresMs": {
+                  "type": "integer",
+                  "description": "Session expiry in Unix milliseconds"
+                }
+              },
+              "required": [
+                "token",
+                "expiresMs"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "auth.session": {
+            "description": "Read the current authenticated account",
+            "capabilities": [
+              "lenso.auth-store"
+            ],
+            "effects": [],
+            "inputSchema": {
+              "type": "null"
+            },
+            "outputSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Account identifier"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Normalized account name"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "auth.logout": {
+            "description": "Revoke the authenticated session",
+            "capabilities": [
+              "lenso.auth-store"
+            ],
+            "effects": [
+              "write:auth.sessions"
+            ],
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "description": "Opaque session token",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "writeOnly": true
+                }
+              },
+              "required": [
+                "token"
+              ],
+              "additionalProperties": false
+            },
+            "outputSchema": {
+              "type": "object",
+              "properties": {
+                "revoked": {
+                  "const": true
+                }
+              },
+              "required": [
+                "revoked"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      },
+      {
+        "id": "files",
+        "actions": [
+          "files.upload",
+          "files.list",
+          "files.stat",
+          "files.download",
+          "files.delete"
+        ],
+        "tasks": [],
+        "events": [],
+        "resources": [
+          "files.metadata",
+          "files.content"
+        ],
+        "metadata": {
+          "description": "Private files with native streaming content",
+          "capabilities": [
+            "lenso.files-metadata",
+            "lenso.blob-store"
+          ]
+        },
+        "actionMetadata": {
+          "files.upload": {
+            "description": "Upload a native byte stream; source is transport-owned and has no JSON representation",
+            "capabilities": [
+              "lenso.files-metadata",
+              "lenso.blob-store"
+            ],
+            "effects": [
+              "write:files.metadata",
+              "write:files.content"
+            ],
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Display filename, at most 255 UTF-8 bytes; no separators or control characters"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "outputSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "File identifier",
+                  "pattern": "^[a-f0-9]{32}$"
+                },
+                "owner": {
+                  "type": "string",
+                  "description": "Trusted owner identifier"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Display filename"
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "sha256": {
+                  "type": "string",
+                  "description": "Content digest"
+                },
+                "created_ms": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "owner",
+                "name",
+                "size",
+                "sha256",
+                "created_ms"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "files.list": {
+            "description": "List the authenticated owner's files",
+            "capabilities": [
+              "lenso.files-metadata"
+            ],
+            "effects": [],
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "after": {
+                  "type": "string",
+                  "description": "Exclusive file cursor; empty starts a page"
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            },
+            "outputSchema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "File identifier",
+                    "pattern": "^[a-f0-9]{32}$"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "description": "Trusted owner identifier"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Display filename"
+                  },
+                  "size": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "description": "Content digest"
+                  },
+                  "created_ms": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "id",
+                  "owner",
+                  "name",
+                  "size",
+                  "sha256",
+                  "created_ms"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "files.stat": {
+            "description": "Read owned file metadata",
+            "capabilities": [
+              "lenso.files-metadata"
+            ],
+            "effects": [],
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Owned file identifier",
+                  "pattern": "^[a-f0-9]{32}$"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "additionalProperties": false
+            },
+            "outputSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "File identifier",
+                  "pattern": "^[a-f0-9]{32}$"
+                },
+                "owner": {
+                  "type": "string",
+                  "description": "Trusted owner identifier"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Display filename"
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "sha256": {
+                  "type": "string",
+                  "description": "Content digest"
+                },
+                "created_ms": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "owner",
+                "name",
+                "size",
+                "sha256",
+                "created_ms"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "files.download": {
+            "description": "Read owned file metadata and a native content stream; no JSON output representation",
+            "capabilities": [
+              "lenso.files-metadata",
+              "lenso.blob-store"
+            ],
+            "effects": [],
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Owned file identifier",
+                  "pattern": "^[a-f0-9]{32}$"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "files.delete": {
+            "description": "Delete an owned file",
+            "capabilities": [
+              "lenso.files-metadata",
+              "lenso.blob-store"
+            ],
+            "effects": [
+              "write:files.metadata",
+              "write:files.content"
+            ],
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Owned file identifier",
+                  "pattern": "^[a-f0-9]{32}$"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "additionalProperties": false
+            },
+            "outputSchema": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    ],
+    "actions": [
+      {
+        "id": "auth.register",
+        "metadata": {
+          "description": "Register an account",
+          "capabilities": [
+            "lenso.auth-store",
+            "lenso.password-hasher"
+          ],
+          "effects": [
+            "write:auth.users"
+          ],
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "ASCII account name",
+                "pattern": "^[A-Za-z0-9_-]{3,64}$"
+              },
+              "password": {
+                "type": "string",
+                "description": "Password, 12 to 128 UTF-8 bytes",
+                "writeOnly": true
+              }
+            },
+            "required": [
+              "name",
+              "password"
+            ],
+            "additionalProperties": false
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Account identifier"
+              },
+              "name": {
+                "type": "string",
+                "description": "Normalized account name"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "id": "auth.login",
+        "metadata": {
+          "description": "Verify credentials and create a session",
+          "capabilities": [
+            "lenso.auth-store",
+            "lenso.password-hasher"
+          ],
+          "effects": [
+            "write:auth.sessions"
+          ],
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "ASCII account name",
+                "pattern": "^[A-Za-z0-9_-]{3,64}$"
+              },
+              "password": {
+                "type": "string",
+                "description": "Password, 12 to 128 UTF-8 bytes",
+                "writeOnly": true
+              }
+            },
+            "required": [
+              "name",
+              "password"
+            ],
+            "additionalProperties": false
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "token": {
+                "type": "string",
+                "description": "Sensitive bearer token returned only on login"
+              },
+              "expiresMs": {
+                "type": "integer",
+                "description": "Session expiry in Unix milliseconds"
+              }
+            },
+            "required": [
+              "token",
+              "expiresMs"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "id": "auth.session",
+        "metadata": {
+          "description": "Read the current authenticated account",
+          "capabilities": [
+            "lenso.auth-store"
+          ],
+          "effects": [],
+          "inputSchema": {
+            "type": "null"
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Account identifier"
+              },
+              "name": {
+                "type": "string",
+                "description": "Normalized account name"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "id": "auth.logout",
+        "metadata": {
+          "description": "Revoke the authenticated session",
+          "capabilities": [
+            "lenso.auth-store"
+          ],
+          "effects": [
+            "write:auth.sessions"
+          ],
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "token": {
+                "type": "string",
+                "description": "Opaque session token",
+                "pattern": "^[0-9a-f]{64}$",
+                "writeOnly": true
+              }
+            },
+            "required": [
+              "token"
+            ],
+            "additionalProperties": false
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "revoked": {
+                "const": true
+              }
+            },
+            "required": [
+              "revoked"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "id": "files.upload",
+        "metadata": {
+          "description": "Upload a native byte stream; source is transport-owned and has no JSON representation",
+          "capabilities": [
+            "lenso.files-metadata",
+            "lenso.blob-store"
+          ],
+          "effects": [
+            "write:files.metadata",
+            "write:files.content"
+          ],
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Display filename, at most 255 UTF-8 bytes; no separators or control characters"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "additionalProperties": false
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "File identifier",
+                "pattern": "^[a-f0-9]{32}$"
+              },
+              "owner": {
+                "type": "string",
+                "description": "Trusted owner identifier"
+              },
+              "name": {
+                "type": "string",
+                "description": "Display filename"
+              },
+              "size": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "sha256": {
+                "type": "string",
+                "description": "Content digest"
+              },
+              "created_ms": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "owner",
+              "name",
+              "size",
+              "sha256",
+              "created_ms"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "id": "files.list",
+        "metadata": {
+          "description": "List the authenticated owner's files",
+          "capabilities": [
+            "lenso.files-metadata"
+          ],
+          "effects": [],
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "after": {
+                "type": "string",
+                "description": "Exclusive file cursor; empty starts a page"
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "outputSchema": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "File identifier",
+                  "pattern": "^[a-f0-9]{32}$"
+                },
+                "owner": {
+                  "type": "string",
+                  "description": "Trusted owner identifier"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Display filename"
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "sha256": {
+                  "type": "string",
+                  "description": "Content digest"
+                },
+                "created_ms": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "owner",
+                "name",
+                "size",
+                "sha256",
+                "created_ms"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      },
+      {
+        "id": "files.stat",
+        "metadata": {
+          "description": "Read owned file metadata",
+          "capabilities": [
+            "lenso.files-metadata"
+          ],
+          "effects": [],
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Owned file identifier",
+                "pattern": "^[a-f0-9]{32}$"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "File identifier",
+                "pattern": "^[a-f0-9]{32}$"
+              },
+              "owner": {
+                "type": "string",
+                "description": "Trusted owner identifier"
+              },
+              "name": {
+                "type": "string",
+                "description": "Display filename"
+              },
+              "size": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "sha256": {
+                "type": "string",
+                "description": "Content digest"
+              },
+              "created_ms": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "owner",
+              "name",
+              "size",
+              "sha256",
+              "created_ms"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "id": "files.download",
+        "metadata": {
+          "description": "Read owned file metadata and a native content stream; no JSON output representation",
+          "capabilities": [
+            "lenso.files-metadata",
+            "lenso.blob-store"
+          ],
+          "effects": [],
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Owned file identifier",
+                "pattern": "^[a-f0-9]{32}$"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "id": "files.delete",
+        "metadata": {
+          "description": "Delete an owned file",
+          "capabilities": [
+            "lenso.files-metadata",
+            "lenso.blob-store"
+          ],
+          "effects": [
+            "write:files.metadata",
+            "write:files.content"
+          ],
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Owned file identifier",
+                "pattern": "^[a-f0-9]{32}$"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "outputSchema": {
+            "type": "null"
+          }
+        }
+      }
+    ]
+  },
+  "invalidInput": {
+    "code": "invalid_input",
+    "message": "Invalid input",
+    "issues": [
+      {
+        "path": [
+          "name"
+        ],
+        "code": "invalid_value"
+      }
+    ]
+  },
+  "checks": [
+    "SDK-derived Auth/Files descriptions",
+    "authenticated discovery without effects",
+    "private credentials, tokens and causes excluded",
+    "native streaming roundtrip",
+    "byte-limit compensation",
+    "owner isolation and delete",
+    "persisted accounts and hashed sessions"
+  ],
+  "effects": {
+    "accounts": 2,
+    "uploads": 1,
+    "deleted": 1,
+    "remainingFiles": 0
+  }
+}

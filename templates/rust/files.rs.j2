@@ -17,7 +17,8 @@ struct Host {files:Arc<files::Files<Store,local::LocalBlobs>>,identity:Arc<dyn c
 fn default_limit()->u32{20}
 fn failure(error:ActionError)->Response {
  let status=match error.code(){ErrorCode::InvalidInput=>StatusCode::BAD_REQUEST,ErrorCode::Unauthenticated=>StatusCode::UNAUTHORIZED,ErrorCode::Forbidden=>StatusCode::FORBIDDEN,ErrorCode::NotFound=>StatusCode::NOT_FOUND,ErrorCode::Conflict=>StatusCode::CONFLICT,ErrorCode::Cancelled=>StatusCode::REQUEST_TIMEOUT,_=>StatusCode::INTERNAL_SERVER_ERROR};
- (status,Json(json!({"code":error.code().as_str(),"message":if error.code()==ErrorCode::Internal{"File operation failed"}else{error.message()}}))).into_response()
+ let public=if error.code()==ErrorCode::Internal{ActionError::new(ErrorCode::Internal,"File operation failed")}else{error};
+ (status,Json(public.public())).into_response()
 }
 fn bearer(request:&Request)->Option<String>{ request.headers().get(header::AUTHORIZATION).and_then(|v|v.to_str().ok()).and_then(|v|v.strip_prefix("Bearer ")).map(str::to_owned) }
 async fn principal(host:&Host,token:Option<String>)->Result<Option<Principal>,ActionError>{
@@ -68,3 +69,5 @@ pub async fn mount(migrate:bool,services:&crate::lenso_host::Services)->Result<c
   .layer(axum::middleware::map_response(|mut r:Response|async move{r.headers_mut().insert(header::CACHE_CONTROL,header::HeaderValue::from_static("no-store"));r.headers_mut().insert("x-content-type-options",header::HeaderValue::from_static("nosniff"));r}));
  Ok(crate::lenso_host::Mounted{router,identity:None})
 }
+
+pub fn describe()->Result<lenso_app::Module,ActionError>{Ok(files::Actions::new("files")?.describe::<Store,local::LocalBlobs>("files"))}

@@ -139,10 +139,11 @@ impl<M: Metadata, B: Blobs> Files<M, B> {
                 .bytes()
                 .any(|b| b < 32 || b == 127 || b == b'/' || b == b'\\')
         {
-            return Err(ActionError::new(
-                ErrorCode::InvalidInput,
-                "Invalid display filename",
-            ));
+            return Err(
+                ActionError::new(ErrorCode::InvalidInput, "Invalid display filename").with_issues(
+                    vec![input_issue("name", lenso_app::InputIssueCode::InvalidValue)],
+                ),
+            );
         }
         let mut bytes = [0; 16];
         getrandom::fill(&mut bytes).map_err(unavailable)?;
@@ -181,7 +182,11 @@ impl<M: Metadata, B: Blobs> Files<M, B> {
                     return Err(ActionError::new(
                         ErrorCode::InvalidInput,
                         "Upload exceeds configured byte limit",
-                    ));
+                    )
+                    .with_issues(vec![input_issue(
+                        "source",
+                        lenso_app::InputIssueCode::OutOfRange,
+                    )]));
                 }
                 hash.update(&buffer[..count]);
                 output
@@ -221,8 +226,20 @@ impl<M: Metadata, B: Blobs> Files<M, B> {
         limit: u32,
     ) -> Result<Vec<FileRecord>> {
         let owner = &require_principal(principal)?.subject;
-        if !after.is_empty() && !valid_id(after) || !(1..=100).contains(&limit) {
-            return Err(ActionError::new(ErrorCode::InvalidInput, "Invalid page"));
+        let mut issues = Vec::new();
+        if !after.is_empty() && !valid_id(after) {
+            issues.push(input_issue(
+                "after",
+                lenso_app::InputIssueCode::InvalidValue,
+            ));
+        }
+        if !(1..=100).contains(&limit) {
+            issues.push(input_issue("limit", lenso_app::InputIssueCode::OutOfRange));
+        }
+        if !issues.is_empty() {
+            return Err(
+                ActionError::new(ErrorCode::InvalidInput, "Invalid page").with_issues(issues)
+            );
         }
         self.metadata.list(owner, after, limit).await
     }
@@ -252,5 +269,237 @@ impl<M: Metadata, B: Blobs> Files<M, B> {
         }
         self.blobs.remove(id).await?;
         self.metadata.finish(id, owner, Retired::Deleting).await
+    }
+}
+
+/// Optional SDK handles over native Files methods, including non-serializable streams.
+#[derive(Debug, Clone)]
+pub struct Actions {
+    pub upload: Upload,
+    pub list: List,
+    pub stat: Stat,
+    pub download: Download,
+    pub delete: Delete,
+}
+#[derive(Debug, Clone)]
+pub struct Upload(String);
+#[derive(Debug, Clone)]
+pub struct List(String);
+#[derive(Debug, Clone)]
+pub struct Stat(String);
+#[derive(Debug, Clone)]
+pub struct Download(String);
+#[derive(Debug, Clone)]
+pub struct Delete(String);
+
+/// Owned native stream. The mutex satisfies SDK input Sync without requiring the reader to be Sync.
+pub struct UploadInput {
+    pub name: String,
+    pub source: std::sync::Mutex<Reader>,
+}
+impl UploadInput {
+    pub fn new(name: String, source: Reader) -> Self {
+        Self {
+            name,
+            source: std::sync::Mutex::new(source),
+        }
+    }
+}
+#[derive(Debug, Deserialize, Default)]
+pub struct Page {
+    pub after: Option<String>,
+    pub limit: Option<u32>,
+}
+#[derive(Debug, Deserialize)]
+pub struct FileInput {
+    pub id: String,
+}
+fn action_metadata(operation: &str) -> lenso_app::ActionMetadata {
+    let declaration: serde_json::Value = serde_json::from_str(include_str!("metadata.json"))
+        .expect("embedded Files metadata is valid JSON");
+    serde_json::from_value(declaration["actions"][operation].clone())
+        .expect("embedded Files Action metadata matches SDK")
+}
+fn input_issue(field: &str, code: lenso_app::InputIssueCode) -> lenso_app::InputIssue {
+    lenso_app::InputIssue {
+        path: vec![lenso_app::InputSegment::Field(field.into())],
+        code,
+    }
+}
+impl Actions {
+    pub fn new(id: &str) -> Result<Self> {
+        if id.split('.').count() > 32
+            || !id.split('.').all(|part| {
+                !part.is_empty()
+                    && part.len() <= 64
+                    && part
+                        .bytes()
+                        .all(|b| b.is_ascii_alphanumeric() || b"_-".contains(&b))
+            })
+        {
+            return Err(ActionError::new(
+                ErrorCode::InvalidInput,
+                "Invalid Files instance identifier",
+            ));
+        }
+        Ok(Self {
+            upload: Upload(format!("{id}.upload")),
+            list: List(format!("{id}.list")),
+            stat: Stat(format!("{id}.stat")),
+            download: Download(format!("{id}.download")),
+            delete: Delete(format!("{id}.delete")),
+        })
+    }
+    pub fn describe<M: Metadata, B: Blobs>(&self, id: &str) -> lenso_app::Module {
+        let declaration: serde_json::Value = serde_json::from_str(include_str!("metadata.json"))
+            .expect("embedded Files metadata is valid JSON");
+        let mut module = lenso_app::Module::new(id).with_metadata(
+            serde_json::from_value(declaration["module"].clone())
+                .expect("embedded Files Module metadata matches SDK"),
+        );
+        module
+            .action::<Files<M, B>, _>(&self.upload)
+            .action::<Files<M, B>, _>(&self.list)
+            .action::<Files<M, B>, _>(&self.stat)
+            .action::<Files<M, B>, _>(&self.download)
+            .action::<Files<M, B>, _>(&self.delete)
+            .resource(format!("{id}.metadata"))
+            .resource(format!("{id}.content"));
+        module
+    }
+}
+impl<M: Metadata, B: Blobs> lenso_app::Action<Files<M, B>> for Upload {
+    type Input = UploadInput;
+    type Output = FileRecord;
+    fn id(&self) -> &str {
+        &self.0
+    }
+    fn metadata(&self) -> Option<lenso_app::ActionMetadata> {
+        Some(action_metadata("upload"))
+    }
+    async fn authorize(
+        &self,
+        context: &lenso_app::Context<Files<M, B>>,
+        _: &Self::Input,
+    ) -> Result<()> {
+        require_principal(context.principal.as_ref()).map(|_| ())
+    }
+    async fn run(
+        &self,
+        context: &lenso_app::Context<Files<M, B>>,
+        input: Self::Input,
+    ) -> Result<FileRecord> {
+        context
+            .resources
+            .upload(
+                context.principal.as_ref(),
+                &input.name,
+                input.source.into_inner().map_err(unavailable)?,
+            )
+            .await
+    }
+}
+impl<M: Metadata, B: Blobs> lenso_app::Action<Files<M, B>> for List {
+    type Input = Page;
+    type Output = Vec<FileRecord>;
+    fn id(&self) -> &str {
+        &self.0
+    }
+    fn metadata(&self) -> Option<lenso_app::ActionMetadata> {
+        Some(action_metadata("list"))
+    }
+    async fn authorize(&self, context: &lenso_app::Context<Files<M, B>>, _: &Page) -> Result<()> {
+        require_principal(context.principal.as_ref()).map(|_| ())
+    }
+    async fn run(
+        &self,
+        context: &lenso_app::Context<Files<M, B>>,
+        input: Page,
+    ) -> Result<Self::Output> {
+        context
+            .resources
+            .list(
+                context.principal.as_ref(),
+                input.after.as_deref().unwrap_or(""),
+                input.limit.unwrap_or(20),
+            )
+            .await
+    }
+}
+impl<M: Metadata, B: Blobs> lenso_app::Action<Files<M, B>> for Stat {
+    type Input = FileInput;
+    type Output = FileRecord;
+    fn id(&self) -> &str {
+        &self.0
+    }
+    fn metadata(&self) -> Option<lenso_app::ActionMetadata> {
+        Some(action_metadata("stat"))
+    }
+    async fn authorize(
+        &self,
+        context: &lenso_app::Context<Files<M, B>>,
+        _: &FileInput,
+    ) -> Result<()> {
+        require_principal(context.principal.as_ref()).map(|_| ())
+    }
+    async fn run(
+        &self,
+        context: &lenso_app::Context<Files<M, B>>,
+        input: FileInput,
+    ) -> Result<FileRecord> {
+        context
+            .resources
+            .stat(context.principal.as_ref(), &input.id)
+            .await
+    }
+}
+impl<M: Metadata, B: Blobs> lenso_app::Action<Files<M, B>> for Download {
+    type Input = FileInput;
+    type Output = (FileRecord, Reader);
+    fn id(&self) -> &str {
+        &self.0
+    }
+    fn metadata(&self) -> Option<lenso_app::ActionMetadata> {
+        Some(action_metadata("download"))
+    }
+    async fn authorize(
+        &self,
+        context: &lenso_app::Context<Files<M, B>>,
+        _: &FileInput,
+    ) -> Result<()> {
+        require_principal(context.principal.as_ref()).map(|_| ())
+    }
+    async fn run(
+        &self,
+        context: &lenso_app::Context<Files<M, B>>,
+        input: FileInput,
+    ) -> Result<Self::Output> {
+        context
+            .resources
+            .download(context.principal.as_ref(), &input.id)
+            .await
+    }
+}
+impl<M: Metadata, B: Blobs> lenso_app::Action<Files<M, B>> for Delete {
+    type Input = FileInput;
+    type Output = ();
+    fn id(&self) -> &str {
+        &self.0
+    }
+    fn metadata(&self) -> Option<lenso_app::ActionMetadata> {
+        Some(action_metadata("delete"))
+    }
+    async fn authorize(
+        &self,
+        context: &lenso_app::Context<Files<M, B>>,
+        _: &FileInput,
+    ) -> Result<()> {
+        require_principal(context.principal.as_ref()).map(|_| ())
+    }
+    async fn run(&self, context: &lenso_app::Context<Files<M, B>>, input: FileInput) -> Result<()> {
+        context
+            .resources
+            .delete(context.principal.as_ref(), &input.id)
+            .await
     }
 }

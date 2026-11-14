@@ -7,7 +7,7 @@ for lang in ('typescript','rust'):
     ext='ts' if lang=='typescript' else 'rs'
     runtime='node26' if lang=='typescript' else 'tokio'
     prefix='typescript/src' if lang=='typescript' else 'rust/src'
-    modules={'auth':['core.ts','contracts.ts'] if lang=='typescript' else ['mod.rs'],
+    modules={'auth':['core.ts','contracts.ts','metadata.json'] if lang=='typescript' else ['mod.rs','metadata.json'],
              'sqlite':['store.ts','schema.ts'] if lang=='typescript' else ['mod.rs','schema.sql'],
              'postgres':['store.ts','schema.ts'] if lang=='typescript' else ['mod.rs','schema.sql'],
              'scrypt':['hasher.ts'] if lang=='typescript' else ['mod.rs']}
@@ -69,8 +69,8 @@ instances = {{{{ auth = "auth" }}}}
 bindings = {{{{ "auth.store" = {{{{ type="module", module="postgres" }}}} }}}}
 context = {{{{language="{lang}", runtime="{runtime}"}}}}
 '''.replace('{{','{').replace('}}','}')
-    deps= [('npm','@lenso/app','0.1.1','auth',{}),('npm','zod','^4','auth',{}),('npm','pg','^8.16','postgres',{}),('npm','@types/pg','^8.15','postgres',{'section':'devDependencies'}),('npm','@types/node','^26','auth',{'section':'devDependencies'}),('npm','typescript','^6','auth',{'section':'devDependencies'})] if lang=='typescript' else [
-      ('cargo','lenso-app','0.1.1','auth',{'features':['json']}),('cargo','serde','1','auth',{'features':['derive']}),('cargo','sha2','0.10','auth',{}),('cargo','getrandom','0.3','auth',{}),('cargo','rusqlite','0.42','sqlite',{'features':['bundled']}),('cargo','tokio','1','sqlite',{'features':['rt','sync']}),('cargo','tokio','1','scrypt',{'features':['rt','sync']}),('cargo','scrypt','0.11','scrypt',{}),('cargo','subtle','2','scrypt',{}),('cargo','tokio-postgres','0.7','postgres',{}),('cargo','postgres-native-tls','0.5','postgres',{}),('cargo','native-tls','0.2','postgres',{}),('cargo','tokio','1','postgres',{'features':['rt','sync','net','time']})]
+    deps= [('npm','@lenso/app','0.1.2','auth',{}),('npm','zod','^4','auth',{}),('npm','pg','^8.16','postgres',{}),('npm','@types/pg','^8.15','postgres',{'section':'devDependencies'}),('npm','@types/node','^26','auth',{'section':'devDependencies'}),('npm','typescript','^6','auth',{'section':'devDependencies'})] if lang=='typescript' else [
+      ('cargo','lenso-app','0.1.2','auth',{'features':['json']}),('cargo','serde','1','auth',{'features':['derive']}),('cargo','serde_json','1','auth',{}),('cargo','sha2','0.10','auth',{}),('cargo','getrandom','0.3','auth',{}),('cargo','rusqlite','0.42','sqlite',{'features':['bundled']}),('cargo','tokio','1','sqlite',{'features':['rt','sync']}),('cargo','tokio','1','scrypt',{'features':['rt','sync']}),('cargo','scrypt','0.11','scrypt',{}),('cargo','subtle','2','scrypt',{}),('cargo','tokio-postgres','0.7','postgres',{}),('cargo','postgres-native-tls','0.5','postgres',{}),('cargo','native-tls','0.2','postgres',{}),('cargo','tokio','1','postgres',{'features':['rt','sync','net','time']})]
     def literal(v):
       if isinstance(v,dict):return '{'+', '.join(k+'='+literal(x) for k,x in v.items())+'}'
       return json.dumps(v)
@@ -99,7 +99,7 @@ for language in ('typescript','rust'):
     start=text.index('[samples.multiple]');end=text.index('[samples.postgres]',start);text=text[:start]+text[end:]
     if language=='rust':
         text+='\n[[generator.dependencies]]\necosystem="cargo"\npackage="tokio"\nversion="1"\nmodule="auth"\noptions={features=["macros","net","rt","rt-multi-thread","signal","sync","time"]}\n'
-        for name,version in [('axum','0.8'),('serde_json','1')]:
+        for name,version in [('axum','0.8')]:
             text+='\n[[generator.dependencies]]\necosystem="cargo"\npackage="'+name+'"\nversion="'+version+'"\nmodule="auth"\noptions={}\n'
     tomllib.loads(text)
     (root/f'auth.{language}.app.toml').write_text(text)
@@ -109,3 +109,6 @@ for language in ('typescript','rust'):
     modern=modern.replace('"macros","net","rt","rt-multi-thread","signal","sync","time"','"fs","io-util","macros","net","rt","rt-multi-thread","signal","sync","time"')
     tomllib.loads(modern)
     (root/f'auth.{language}.app-v2.toml').write_text(modern)
+
+for lang in ("typescript", "rust"):
+    (root/lang/"src/modules/auth/metadata.json").write_text((root/"contracts/auth/metadata.json").read_text())

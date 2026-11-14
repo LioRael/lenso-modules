@@ -1,0 +1,903 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "source_head_sha": "f6e35616f92d298f7e6542d21fbc24d3b6e51f3d",
+  "source_run": 43640925161,
+  "cli_run": 43640925090,
+  "source_reports": {
+    "module-metadata-macOS": {
+      "artifact_id": 14132410814,
+      "artifact_digest": "sha256:140a144c8e87bc4aee1f97b5b4f8099297ff80561f1507fe514ba5b72443549c",
+      "run_id": 43640925161,
+      "head_sha": "f6e35616f92d298f7e6542d21fbc24d3b6e51f3d",
+      "reports": {
+        "typescript": {
+          "platform": {
+            "system": "darwin",
+            "machine": "arm64",
+            "node": "v26.13.1"
+          },
+          "contract_sha256": "0fe2cba697bc86317148220ac8b133ebfe9cbbeecf5282ca104b507480d2803f",
+          "invalidInput": {
+            "code": "invalid_input",
+            "message": "Invalid input",
+            "issues": [
+              {
+                "path": [
+                  "name"
+                ],
+                "code": "invalid_value"
+              }
+            ]
+          },
+          "effects": {
+            "accounts": 2,
+            "uploads": 1,
+            "deleted": 1,
+            "remainingFiles": 0
+          },
+          "checks": [
+            "SDK-derived Auth/Files descriptions",
+            "authenticated discovery without effects",
+            "private credentials, tokens and causes excluded",
+            "native streaming roundtrip",
+            "byte-limit compensation",
+            "owner isolation and delete",
+            "persisted accounts and hashed sessions"
+          ]
+        },
+        "rust": {
+          "platform": {
+            "system": "darwin",
+            "machine": "arm64",
+            "node": "v26.13.1"
+          },
+          "contract_sha256": "0fe2cba697bc86317148220ac8b133ebfe9cbbeecf5282ca104b507480d2803f",
+          "invalidInput": {
+            "code": "invalid_input",
+            "message": "Invalid input",
+            "issues": [
+              {
+                "path": [
+                  "name"
+                ],
+                "code": "invalid_value"
+              }
+            ]
+          },
+          "effects": {
+            "accounts": 2,
+            "uploads": 1,
+            "deleted": 1,
+            "remainingFiles": 0
+          },
+          "checks": [
+            "SDK-derived Auth/Files descriptions",
+            "authenticated discovery without effects",
+            "private credentials, tokens and causes excluded",
+            "native streaming roundtrip",
+            "byte-limit compensation",
+            "owner isolation and delete",
+            "persisted accounts and hashed sessions"
+          ]
+        }
+      }
+    },
+    "module-metadata-Linux": {
+      "artifact_id": 14132340771,
+      "artifact_digest": "sha256:4bcd1d3c487f1bfaa5cf04266dbdf5cce9353e18e3329cabf78ea63e843a0808",
+      "run_id": 43640925161,
+      "head_sha": "f6e35616f92d298f7e6542d21fbc24d3b6e51f3d",
+      "reports": {
+        "typescript": {
+          "platform": {
+            "system": "linux",
+            "machine": "x64",
+            "node": "v26.13.1"
+          },
+          "contract_sha256": "0fe2cba697bc86317148220ac8b133ebfe9cbbeecf5282ca104b507480d2803f",
+          "invalidInput": {
+            "code": "invalid_input",
+            "message": "Invalid input",
+            "issues": [
+              {
+                "path": [
+                  "name"
+                ],
+                "code": "invalid_value"
+              }
+            ]
+          },
+          "effects": {
+            "accounts": 2,
+            "uploads": 1,
+            "deleted": 1,
+            "remainingFiles": 0
+          },
+          "checks": [
+            "SDK-derived Auth/Files descriptions",
+            "authenticated discovery without effects",
+            "private credentials, tokens and causes excluded",
+            "native streaming roundtrip",
+            "byte-limit compensation",
+            "owner isolation and delete",
+            "persisted accounts and hashed sessions"
+          ]
+        },
+        "rust": {
+          "platform": {
+            "system": "linux",
+            "machine": "x64",
+            "node": "v26.13.1"
+          },
+          "contract_sha256": "0fe2cba697bc86317148220ac8b133ebfe9cbbeecf5282ca104b507480d2803f",
+          "invalidInput": {
+            "code": "invalid_input",
+            "message": "Invalid input",
+            "issues": [
+              {
+                "path": [
+                  "name"
+                ],
+                "code": "invalid_value"
+              }
+            ]
+          },
+          "effects": {
+            "accounts": 2,
+            "uploads": 1,
+            "deleted": 1,
+            "remainingFiles": 0
+          },
+          "checks": [
+            "SDK-derived Auth/Files descriptions",
+            "authenticated discovery without effects",
+            "private credentials, tokens and causes excluded",
+            "native streaming roundtrip",
+            "byte-limit compensation",
+            "owner isolation and delete",
+            "persisted accounts and hashed sessions"
+          ]
+        }
+      }
+    }
+  },
+  "cli_reports": {
+    "code-module-consumers-macOS-rust": {
+      "artifact_id": 14132960491,
+      "artifact_digest": "sha256:2f5d8c52d4e10eea4ff6abf97018783503fb09da688cdcc5ca4c05fb7820a1a8",
+      "run_id": 43640925090,
+      "head_sha": "f6e35616f92d298f7e6542d21fbc24d3b6e51f3d",
+      "platform": {
+        "system": "Darwin",
+        "machine": "arm64",
+        "node": "v26.13.1",
+        "rust": "rustc 1.99.0 (b940084d7 2026-09-28)"
+      },
+      "checkout_sha": "ac15bfbcd4144c685b9991efd7dd0f0df26a3b9a",
+      "installed_consumers": [
+        {
+          "project": "consumers/rust-postgres",
+          "ecosystem": "crates.io",
+          "sdk_version": "0.1.2",
+          "registry": "registry+https://github.com/rust-lang/crates.io-index"
+        },
+        {
+          "project": "consumers/rust-sqlite",
+          "ecosystem": "crates.io",
+          "sdk_version": "0.1.2",
+          "registry": "registry+https://github.com/rust-lang/crates.io-index"
+        },
+        {
+          "project": "apps/rust-postgres/app",
+          "ecosystem": "crates.io",
+          "sdk_version": "0.1.2",
+          "registry": "registry+https://github.com/rust-lang/crates.io-index"
+        },
+        {
+          "project": "apps/rust-sqlite/app",
+          "ecosystem": "crates.io",
+          "sdk_version": "0.1.2",
+          "registry": "registry+https://github.com/rust-lang/crates.io-index"
+        },
+        {
+          "project": "files/rust-postgres/app",
+          "ecosystem": "crates.io",
+          "sdk_version": "0.1.2",
+          "registry": "registry+https://github.com/rust-lang/crates.io-index"
+        },
+        {
+          "project": "files/rust-sqlite/app",
+          "ecosystem": "crates.io",
+          "sdk_version": "0.1.2",
+          "registry": "registry+https://github.com/rust-lang/crates.io-index"
+        },
+        {
+          "project": "files-upgrade/rust-postgres/app",
+          "ecosystem": "crates.io",
+          "sdk_version": "0.1.2",
+          "registry": "registry+https://github.com/rust-lang/crates.io-index"
+        },
+        {
+          "project": "files-upgrade/rust-sqlite/app",
+          "ecosystem": "crates.io",
+          "sdk_version": "0.1.2",
+          "registry": "registry+https://github.com/rust-lang/crates.io-index"
+        }
+      ],
+      "cases": {
+        "consumers/rust-postgres/verification.json": {
+          "language": "rust",
+          "storage": "postgres",
+          "switched_to": "sqlite",
+          "official": false,
+          "local_modules": true,
+          "code_version": "0.3.6",
+          "project_config": true,
+          "compiled_and_ran": true,
+          "sdk_metadata_and_input_errors": true,
+          "preview_denial_update_offline": true,
+          "native_cleanup": true,
+          "data_preserved": true
+        },
+        "consumers/rust-sqlite/verification.json": {
+          "language": "rust",
+          "storage": "sqlite",
+          "switched_to": "postgres",
+          "official": false,
+          "local_modules": true,
+          "code_version": "0.3.6",
+          "project_config": true,
+          "compiled_and_ran": true,
+          "sdk_metadata_and_input_errors": true,
+          "preview_denial_update_offline": true,
+          "native_cleanup": true,
+          "data_preserved": true
+        },
+        "apps/rust-postgres/verification.json": {
+          "language": "rust",
+          "storage": "postgres",
+          "official": false,
+          "native_create_and_health": true,
+          "auth_http_and_persistence": true,
+          "preview_and_two_phase_denial": true,
+          "pending_preparation_retry": true,
+          "run_denial": true,
+          "user_changes_preserved": true,
+          "supervised_stop": true,
+          "offline_replay": true
+        },
+        "apps/rust-sqlite/verification.json": {
+          "language": "rust",
+          "storage": "sqlite",
+          "official": false,
+          "native_create_and_health": true,
+          "auth_http_and_persistence": true,
+          "preview_and_two_phase_denial": true,
+          "pending_preparation_retry": true,
+          "run_denial": true,
+          "user_changes_preserved": true,
+          "supervised_stop": true,
+          "offline_replay": true
+        },
+        "files/rust-postgres/verification.json": {
+          "language": "rust",
+          "storage": "postgres",
+          "legacy_app_upgrade": false,
+          "official": false,
+          "public_pins": {},
+          "streamed_bytes": 1049287,
+          "shared_identity": true,
+          "cross_user_denied": true,
+          "revoked_session_denied": true,
+          "restart_persistence": true,
+          "delete_content": true,
+          "oversize_cleanup": true,
+          "interrupted_upload_cleanup": true,
+          "preview_denial_update_offline": true
+        },
+        "files/rust-sqlite/verification.json": {
+          "language": "rust",
+          "storage": "sqlite",
+          "legacy_app_upgrade": false,
+          "official": false,
+          "public_pins": {},
+          "streamed_bytes": 1049287,
+          "shared_identity": true,
+          "cross_user_denied": true,
+          "revoked_session_denied": true,
+          "restart_persistence": true,
+          "delete_content": true,
+          "oversize_cleanup": true,
+          "interrupted_upload_cleanup": true,
+          "preview_denial_update_offline": true
+        },
+        "files-upgrade/rust-postgres/verification.json": {
+          "language": "rust",
+          "storage": "postgres",
+          "legacy_app_upgrade": true,
+          "official": false,
+          "public_pins": {},
+          "streamed_bytes": 1049287,
+          "shared_identity": true,
+          "cross_user_denied": true,
+          "revoked_session_denied": true,
+          "restart_persistence": true,
+          "delete_content": true,
+          "oversize_cleanup": true,
+          "interrupted_upload_cleanup": true,
+          "preview_denial_update_offline": true
+        },
+        "files-upgrade/rust-sqlite/verification.json": {
+          "language": "rust",
+          "storage": "sqlite",
+          "legacy_app_upgrade": true,
+          "official": false,
+          "public_pins": {},
+          "streamed_bytes": 1049287,
+          "shared_identity": true,
+          "cross_user_denied": true,
+          "revoked_session_denied": true,
+          "restart_persistence": true,
+          "delete_content": true,
+          "oversize_cleanup": true,
+          "interrupted_upload_cleanup": true,
+          "preview_denial_update_offline": true
+        }
+      }
+    },
+    "code-module-consumers-Linux-typescript": {
+      "artifact_id": 14132381562,
+      "artifact_digest": "sha256:f77379d625c4e880faaef7e515a77f954698cf76f244ec4fe9da49ba539d70cd",
+      "run_id": 43640925090,
+      "head_sha": "f6e35616f92d298f7e6542d21fbc24d3b6e51f3d",
+      "platform": {
+        "system": "Linux",
+        "machine": "x86_64",
+        "node": "v26.13.1",
+        "rust": "rustc 1.99.0 (b940084d7 2026-09-28)"
+      },
+      "checkout_sha": "ac15bfbcd4144c685b9991efd7dd0f0df26a3b9a",
+      "installed_consumers": [
+        {
+          "project": "consumers/typescript-postgres",
+          "ecosystem": "npm",
+          "sdk_version": "0.1.2",
+          "registry": "https://registry.npmjs.org/"
+        },
+        {
+          "project": "consumers/typescript-sqlite",
+          "ecosystem": "npm",
+          "sdk_version": "0.1.2",
+          "registry": "https://registry.npmjs.org/"
+        },
+        {
+          "project": "apps/typescript-postgres/app",
+          "ecosystem": "npm",
+          "sdk_version": "0.1.2",
+          "registry": "https://registry.npmjs.org/"
+        },
+        {
+          "project": "apps/typescript-sqlite/app",
+          "ecosystem": "npm",
+          "sdk_version": "0.1.2",
+          "registry": "https://registry.npmjs.org/"
+        },
+        {
+          "project": "files/typescript-postgres/app",
+          "ecosystem": "npm",
+          "sdk_version": "0.1.2",
+          "registry": "https://registry.npmjs.org/"
+        },
+        {
+          "project": "files/typescript-sqlite/app",
+          "ecosystem": "npm",
+          "sdk_version": "0.1.2",
+          "registry": "https://registry.npmjs.org/"
+        },
+        {
+          "project": "files-upgrade/typescript-postgres/app",
+          "ecosystem": "npm",
+          "sdk_version": "0.1.2",
+          "registry": "https://registry.npmjs.org/"
+        },
+        {
+          "project": "files-upgrade/typescript-sqlite/app",
+          "ecosystem": "npm",
+          "sdk_version": "0.1.2",
+          "registry": "https://registry.npmjs.org/"
+        }
+      ],
+      "cases": {
+        "consumers/typescript-postgres/verification.json": {
+          "language": "typescript",
+          "storage": "postgres",
+          "switched_to": "sqlite",
+          "official": false,
+          "local_modules": true,
+          "code_version": "0.3.6",
+          "project_config": true,
+          "compiled_and_ran": true,
+          "sdk_metadata_and_input_errors": true,
+          "preview_denial_update_offline": true,
+          "native_cleanup": true,
+          "data_preserved": true
+        },
+        "consumers/typescript-sqlite/verification.json": {
+          "language": "typescript",
+          "storage": "sqlite",
+          "switched_to": "postgres",
+          "official": false,
+          "local_modules": true,
+          "code_version": "0.3.6",
+          "project_config": true,
+          "compiled_and_ran": true,
+          "sdk_metadata_and_input_errors": true,
+          "preview_denial_update_offline": true,
+          "native_cleanup": true,
+          "data_preserved": true
+        },
+        "apps/typescript-postgres/verification.json": {
+          "language": "typescript",
+          "storage": "postgres",
+          "official": false,
+          "native_create_and_health": true,
+          "auth_http_and_persistence": true,
+          "preview_and_two_phase_denial": true,
+          "pending_preparation_retry": true,
+          "run_denial": true,
+          "user_changes_preserved": true,
+          "supervised_stop": true,
+          "offline_replay": true
+        },
+        "apps/typescript-sqlite/verification.json": {
+          "language": "typescript",
+          "storage": "sqlite",
+          "official": false,
+          "native_create_and_health": true,
+          "auth_http_and_persistence": true,
+          "preview_and_two_phase_denial": true,
+          "pending_preparation_retry": true,
+          "run_denial": true,
+          "user_changes_preserved": true,
+          "supervised_stop": true,
+          "offline_replay": true
+        },
+        "files/typescript-postgres/verification.json": {
+          "language": "typescript",
+          "storage": "postgres",
+          "legacy_app_upgrade": false,
+          "official": false,
+          "public_pins": {},
+          "streamed_bytes": 1049287,
+          "shared_identity": true,
+          "cross_user_denied": true,
+          "revoked_session_denied": true,
+          "restart_persistence": true,
+          "delete_content": true,
+          "oversize_cleanup": true,
+          "interrupted_upload_cleanup": true,
+          "preview_denial_update_offline": true
+        },
+        "files/typescript-sqlite/verification.json": {
+          "language": "typescript",
+          "storage": "sqlite",
+          "legacy_app_upgrade": false,
+          "official": false,
+          "public_pins": {},
+          "streamed_bytes": 1049287,
+          "shared_identity": true,
+          "cross_user_denied": true,
+          "revoked_session_denied": true,
+          "restart_persistence": true,
+          "delete_content": true,
+          "oversize_cleanup": true,
+          "interrupted_upload_cleanup": true,
+          "preview_denial_update_offline": true
+        },
+        "files-upgrade/typescript-postgres/verification.json": {
+          "language": "typescript",
+          "storage": "postgres",
+          "legacy_app_upgrade": true,
+          "official": false,
+          "public_pins": {},
+          "streamed_bytes": 1049287,
+          "shared_identity": true,
+          "cross_user_denied": true,
+          "revoked_session_denied": true,
+          "restart_persistence": true,
+          "delete_content": true,
+          "oversize_cleanup": true,
+          "interrupted_upload_cleanup": true,
+          "preview_denial_update_offline": true
+        },
+        "files-upgrade/typescript-sqlite/verification.json": {
+          "language": "typescript",
+          "storage": "sqlite",
+          "legacy_app_upgrade": true,
+          "official": false,
+          "public_pins": {},
+          "streamed_bytes": 1049287,
+          "shared_identity": true,
+          "cross_user_denied": true,
+          "revoked_session_denied": true,
+          "restart_persistence": true,
+          "delete_content": true,
+          "oversize_cleanup": true,
+          "interrupted_upload_cleanup": true,
+          "preview_denial_update_offline": true
+        }
+      }
+    },
+    "code-module-consumers-macOS-typescript": {
+      "artifact_id": 14132362339,
+      "artifact_digest": "sha256:76fb9ca6ac6ee2f7cba51027ab9321c18721a681ed76a366eddaf239f531d197",
+      "run_id": 43640925090,
+      "head_sha": "f6e35616f92d298f7e6542d21fbc24d3b6e51f3d",
+      "platform": {
+        "system": "Darwin",
+        "machine": "arm64",
+        "node": "v26.13.1",
+        "rust": "rustc 1.99.0 (b940084d7 2026-09-28)"
+      },
+      "checkout_sha": "ac15bfbcd4144c685b9991efd7dd0f0df26a3b9a",
+      "installed_consumers": [
+        {
+          "project": "consumers/typescript-postgres",
+          "ecosystem": "npm",
+          "sdk_version": "0.1.2",
+          "registry": "https://registry.npmjs.org/"
+        },
+        {
+          "project": "consumers/typescript-sqlite",
+          "ecosystem": "npm",
+          "sdk_version": "0.1.2",
+          "registry": "https://registry.npmjs.org/"
+        },
+        {
+          "project": "apps/typescript-postgres/app",
+          "ecosystem": "npm",
+          "sdk_version": "0.1.2",
+          "registry": "https://registry.npmjs.org/"
+        },
+        {
+          "project": "apps/typescript-sqlite/app",
+          "ecosystem": "npm",
+          "sdk_version": "0.1.2",
+          "registry": "https://registry.npmjs.org/"
+        },
+        {
+          "project": "files/typescript-postgres/app",
+          "ecosystem": "npm",
+          "sdk_version": "0.1.2",
+          "registry": "https://registry.npmjs.org/"
+        },
+        {
+          "project": "files/typescript-sqlite/app",
+          "ecosystem": "npm",
+          "sdk_version": "0.1.2",
+          "registry": "https://registry.npmjs.org/"
+        },
+        {
+          "project": "files-upgrade/typescript-postgres/app",
+          "ecosystem": "npm",
+          "sdk_version": "0.1.2",
+          "registry": "https://registry.npmjs.org/"
+        },
+        {
+          "project": "files-upgrade/typescript-sqlite/app",
+          "ecosystem": "npm",
+          "sdk_version": "0.1.2",
+          "registry": "https://registry.npmjs.org/"
+        }
+      ],
+      "cases": {
+        "consumers/typescript-postgres/verification.json": {
+          "language": "typescript",
+          "storage": "postgres",
+          "switched_to": "sqlite",
+          "official": false,
+          "local_modules": true,
+          "code_version": "0.3.6",
+          "project_config": true,
+          "compiled_and_ran": true,
+          "sdk_metadata_and_input_errors": true,
+          "preview_denial_update_offline": true,
+          "native_cleanup": true,
+          "data_preserved": true
+        },
+        "consumers/typescript-sqlite/verification.json": {
+          "language": "typescript",
+          "storage": "sqlite",
+          "switched_to": "postgres",
+          "official": false,
+          "local_modules": true,
+          "code_version": "0.3.6",
+          "project_config": true,
+          "compiled_and_ran": true,
+          "sdk_metadata_and_input_errors": true,
+          "preview_denial_update_offline": true,
+          "native_cleanup": true,
+          "data_preserved": true
+        },
+        "apps/typescript-postgres/verification.json": {
+          "language": "typescript",
+          "storage": "postgres",
+          "official": false,
+          "native_create_and_health": true,
+          "auth_http_and_persistence": true,
+          "preview_and_two_phase_denial": true,
+          "pending_preparation_retry": true,
+          "run_denial": true,
+          "user_changes_preserved": true,
+          "supervised_stop": true,
+          "offline_replay": true
+        },
+        "apps/typescript-sqlite/verification.json": {
+          "language": "typescript",
+          "storage": "sqlite",
+          "official": false,
+          "native_create_and_health": true,
+          "auth_http_and_persistence": true,
+          "preview_and_two_phase_denial": true,
+          "pending_preparation_retry": true,
+          "run_denial": true,
+          "user_changes_preserved": true,
+          "supervised_stop": true,
+          "offline_replay": true
+        },
+        "files/typescript-postgres/verification.json": {
+          "language": "typescript",
+          "storage": "postgres",
+          "legacy_app_upgrade": false,
+          "official": false,
+          "public_pins": {},
+          "streamed_bytes": 1049287,
+          "shared_identity": true,
+          "cross_user_denied": true,
+          "revoked_session_denied": true,
+          "restart_persistence": true,
+          "delete_content": true,
+          "oversize_cleanup": true,
+          "interrupted_upload_cleanup": true,
+          "preview_denial_update_offline": true
+        },
+        "files/typescript-sqlite/verification.json": {
+          "language": "typescript",
+          "storage": "sqlite",
+          "legacy_app_upgrade": false,
+          "official": false,
+          "public_pins": {},
+          "streamed_bytes": 1049287,
+          "shared_identity": true,
+          "cross_user_denied": true,
+          "revoked_session_denied": true,
+          "restart_persistence": true,
+          "delete_content": true,
+          "oversize_cleanup": true,
+          "interrupted_upload_cleanup": true,
+          "preview_denial_update_offline": true
+        },
+        "files-upgrade/typescript-postgres/verification.json": {
+          "language": "typescript",
+          "storage": "postgres",
+          "legacy_app_upgrade": true,
+          "official": false,
+          "public_pins": {},
+          "streamed_bytes": 1049287,
+          "shared_identity": true,
+          "cross_user_denied": true,
+          "revoked_session_denied": true,
+          "restart_persistence": true,
+          "delete_content": true,
+          "oversize_cleanup": true,
+          "interrupted_upload_cleanup": true,
+          "preview_denial_update_offline": true
+        },
+        "files-upgrade/typescript-sqlite/verification.json": {
+          "language": "typescript",
+          "storage": "sqlite",
+          "legacy_app_upgrade": true,
+          "official": false,
+          "public_pins": {},
+          "streamed_bytes": 1049287,
+          "shared_identity": true,
+          "cross_user_denied": true,
+          "revoked_session_denied": true,
+          "restart_persistence": true,
+          "delete_content": true,
+          "oversize_cleanup": true,
+          "interrupted_upload_cleanup": true,
+          "preview_denial_update_offline": true
+        }
+      }
+    },
+    "code-module-consumers-Linux-rust": {
+      "artifact_id": 14131854392,
+      "artifact_digest": "sha256:fd55facf6cd5b2797ef9c096368454a471cc2f7c85defb6bf5c35a9ef880bc81",
+      "run_id": 43640925090,
+      "head_sha": "f6e35616f92d298f7e6542d21fbc24d3b6e51f3d",
+      "platform": {
+        "system": "Linux",
+        "machine": "x86_64",
+        "node": "v26.13.1",
+        "rust": "rustc 1.99.0 (b940084d7 2026-09-28)"
+      },
+      "checkout_sha": "ac15bfbcd4144c685b9991efd7dd0f0df26a3b9a",
+      "installed_consumers": [
+        {
+          "project": "consumers/rust-postgres",
+          "ecosystem": "crates.io",
+          "sdk_version": "0.1.2",
+          "registry": "registry+https://github.com/rust-lang/crates.io-index"
+        },
+        {
+          "project": "consumers/rust-sqlite",
+          "ecosystem": "crates.io",
+          "sdk_version": "0.1.2",
+          "registry": "registry+https://github.com/rust-lang/crates.io-index"
+        },
+        {
+          "project": "apps/rust-postgres/app",
+          "ecosystem": "crates.io",
+          "sdk_version": "0.1.2",
+          "registry": "registry+https://github.com/rust-lang/crates.io-index"
+        },
+        {
+          "project": "apps/rust-sqlite/app",
+          "ecosystem": "crates.io",
+          "sdk_version": "0.1.2",
+          "registry": "registry+https://github.com/rust-lang/crates.io-index"
+        },
+        {
+          "project": "files/rust-postgres/app",
+          "ecosystem": "crates.io",
+          "sdk_version": "0.1.2",
+          "registry": "registry+https://github.com/rust-lang/crates.io-index"
+        },
+        {
+          "project": "files/rust-sqlite/app",
+          "ecosystem": "crates.io",
+          "sdk_version": "0.1.2",
+          "registry": "registry+https://github.com/rust-lang/crates.io-index"
+        },
+        {
+          "project": "files-upgrade/rust-postgres/app",
+          "ecosystem": "crates.io",
+          "sdk_version": "0.1.2",
+          "registry": "registry+https://github.com/rust-lang/crates.io-index"
+        },
+        {
+          "project": "files-upgrade/rust-sqlite/app",
+          "ecosystem": "crates.io",
+          "sdk_version": "0.1.2",
+          "registry": "registry+https://github.com/rust-lang/crates.io-index"
+        }
+      ],
+      "cases": {
+        "consumers/rust-postgres/verification.json": {
+          "language": "rust",
+          "storage": "postgres",
+          "switched_to": "sqlite",
+          "official": false,
+          "local_modules": true,
+          "code_version": "0.3.6",
+          "project_config": true,
+          "compiled_and_ran": true,
+          "sdk_metadata_and_input_errors": true,
+          "preview_denial_update_offline": true,
+          "native_cleanup": true,
+          "data_preserved": true
+        },
+        "consumers/rust-sqlite/verification.json": {
+          "language": "rust",
+          "storage": "sqlite",
+          "switched_to": "postgres",
+          "official": false,
+          "local_modules": true,
+          "code_version": "0.3.6",
+          "project_config": true,
+          "compiled_and_ran": true,
+          "sdk_metadata_and_input_errors": true,
+          "preview_denial_update_offline": true,
+          "native_cleanup": true,
+          "data_preserved": true
+        },
+        "apps/rust-postgres/verification.json": {
+          "language": "rust",
+          "storage": "postgres",
+          "official": false,
+          "native_create_and_health": true,
+          "auth_http_and_persistence": true,
+          "preview_and_two_phase_denial": true,
+          "pending_preparation_retry": true,
+          "run_denial": true,
+          "user_changes_preserved": true,
+          "supervised_stop": true,
+          "offline_replay": true
+        },
+        "apps/rust-sqlite/verification.json": {
+          "language": "rust",
+          "storage": "sqlite",
+          "official": false,
+          "native_create_and_health": true,
+          "auth_http_and_persistence": true,
+          "preview_and_two_phase_denial": true,
+          "pending_preparation_retry": true,
+          "run_denial": true,
+          "user_changes_preserved": true,
+          "supervised_stop": true,
+          "offline_replay": true
+        },
+        "files/rust-postgres/verification.json": {
+          "language": "rust",
+          "storage": "postgres",
+          "legacy_app_upgrade": false,
+          "official": false,
+          "public_pins": {},
+          "streamed_bytes": 1049287,
+          "shared_identity": true,
+          "cross_user_denied": true,
+          "revoked_session_denied": true,
+          "restart_persistence": true,
+          "delete_content": true,
+          "oversize_cleanup": true,
+          "interrupted_upload_cleanup": true,
+          "preview_denial_update_offline": true
+        },
+        "files/rust-sqlite/verification.json": {
+          "language": "rust",
+          "storage": "sqlite",
+          "legacy_app_upgrade": false,
+          "official": false,
+          "public_pins": {},
+          "streamed_bytes": 1049287,
+          "shared_identity": true,
+          "cross_user_denied": true,
+          "revoked_session_denied": true,
+          "restart_persistence": true,
+          "delete_content": true,
+          "oversize_cleanup": true,
+          "interrupted_upload_cleanup": true,
+          "preview_denial_update_offline": true
+        },
+        "files-upgrade/rust-postgres/verification.json": {
+          "language": "rust",
+          "storage": "postgres",
+          "legacy_app_upgrade": true,
+          "official": false,
+          "public_pins": {},
+          "streamed_bytes": 1049287,
+          "shared_identity": true,
+          "cross_user_denied": true,
+          "revoked_session_denied": true,
+          "restart_persistence": true,
+          "delete_content": true,
+          "oversize_cleanup": true,
+          "interrupted_upload_cleanup": true,
+          "preview_denial_update_offline": true
+        },
+        "files-upgrade/rust-sqlite/verification.json": {
+          "language": "rust",
+          "storage": "sqlite",
+          "legacy_app_upgrade": true,
+          "official": false,
+          "public_pins": {},
+          "streamed_bytes": 1049287,
+          "shared_identity": true,
+          "cross_user_denied": true,
+          "revoked_session_denied": true,
+          "restart_persistence": true,
+          "delete_content": true,
+          "oversize_cleanup": true,
+          "interrupted_upload_cleanup": true,
+          "preview_denial_update_offline": true
+        }
+      }
+    }
+  },
+  "registry_sdk_version": "0.1.2",
+  "public_contracts_match_across_languages_and_platforms": true,
+  "contract_hash_encoding": "SHA-256 of UTF-8 JSON with sorted keys, compact separators, ensure_ascii=False; only platform/runtime omitted from the actual source report.",
+  "total_cli_projects": 32
+}

@@ -1,0 +1,171 @@
+{
+  "module": {
+    "description": "Password authentication and opaque sessions",
+    "capabilities": [
+      "lenso.auth-store",
+      "lenso.password-hasher"
+    ]
+  },
+  "actions": {
+    "register": {
+      "description": "Register an account",
+      "capabilities": [
+        "lenso.auth-store",
+        "lenso.password-hasher"
+      ],
+      "effects": [
+        "write:auth.users"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "ASCII account name",
+            "pattern": "^[A-Za-z0-9_-]{3,64}$"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password, 12 to 128 UTF-8 bytes",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "name",
+          "password"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Account identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Normalized account name"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "login": {
+      "description": "Verify credentials and create a session",
+      "capabilities": [
+        "lenso.auth-store",
+        "lenso.password-hasher"
+      ],
+      "effects": [
+        "write:auth.sessions"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "ASCII account name",
+            "pattern": "^[A-Za-z0-9_-]{3,64}$"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password, 12 to 128 UTF-8 bytes",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "name",
+          "password"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Sensitive bearer token returned only on login"
+          },
+          "expiresMs": {
+            "type": "integer",
+            "description": "Session expiry in Unix milliseconds"
+          }
+        },
+        "required": [
+          "token",
+          "expiresMs"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "session": {
+      "description": "Read the current authenticated account",
+      "capabilities": [
+        "lenso.auth-store"
+      ],
+      "effects": [],
+      "inputSchema": {
+        "type": "null"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Account identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Normalized account name"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "logout": {
+      "description": "Revoke the authenticated session",
+      "capabilities": [
+        "lenso.auth-store"
+      ],
+      "effects": [
+        "write:auth.sessions"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Opaque session token",
+            "pattern": "^[0-9a-f]{64}$",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "revoked": {
+            "const": true
+          }
+        },
+        "required": [
+          "revoked"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}

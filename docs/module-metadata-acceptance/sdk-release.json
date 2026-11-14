@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "status": "published",
+  "source_sha": "13a83df807cbd6ca520954dc2c1b35c2b7d52107",
+  "workflow_run": 43639576110,
+  "workflow_url": "https://github.com/LioRael/lenso/actions/runs/43639576110",
+  "packages": [
+    {
+      "registry": "npm",
+      "name": "@lenso/app",
+      "version": "0.1.2",
+      "integrity": "sha512-y2bLMG+KkbixtNgsPDGirdZCTkNh6LWnvj0T29dHKuvz8+xDeT1i0WOBpjruVU+N+LlffDwTxv4NgyXpAVttVg==",
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@lenso%2fapp@0.1.2",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      }
+    },
+    {
+      "registry": "npm",
+      "name": "@lenso/console",
+      "version": "3.1.0",
+      "integrity": "sha512-KHqd5cGe5rwMCCcsT0a3eZI82f9SItw8+txakScihzAbHNjdGcTJI7gpr3Y0l78BpyZ5iaX/hGxP5BHbDvAV6Q==",
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@lenso%2fconsole@3.1.0",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      }
+    },
+    {
+      "registry": "crates.io",
+      "name": "lenso-app",
+      "version": "0.1.2",
+      "checksum": "a96a2c12384ec6997d840e0da2da64501fa63569a2ba0a44e6c35ef2c98a0141",
+      "trusted_publisher": {
+        "provider": "github",
+        "repository": "LioRael/lenso",
+        "run_id": "43639576110",
+        "sha": "13a83df807cbd6ca520954dc2c1b35c2b7d52107"
+      }
+    }
+  ],
+  "unchanged_packages": {
+    "@lenso/sqlite": "0.1.1",
+    "lenso-sqlite": "0.1.1"
+  }
+}

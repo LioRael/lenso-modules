@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
-import { ActionError, requirePrincipal } from "@lenso/app";
+import { ActionError, Module, defineAction, requirePrincipal } from "@lenso/app";
+import metadata from "./metadata.json" with { type: "json" };
 import type { Principal } from "@lenso/app";
 
 export interface FileRecord {
@@ -27,7 +28,7 @@ export function record(row: Record<string, unknown>): FileRecord {
 }
 export function validId(id: string): boolean { return /^[a-f0-9]{32}$/.test(id); }
 export function validateName(name: string): void {
-  if (!name || Buffer.byteLength(name) > 255 || [...name].some(char => char.charCodeAt(0)<32 || char.charCodeAt(0)===127 || char==="/" || char==="\\")) throw new ActionError("invalid_input", "Invalid display filename");
+  if (!name || Buffer.byteLength(name) > 255 || [...name].some(char => char.charCodeAt(0)<32 || char.charCodeAt(0)===127 || char==="/" || char==="\\")) throw new ActionError("invalid_input", "Invalid display filename", { issues: [{ path: ["name"], code: "invalid_value" }] });
 }
 export function missing(): ActionError { return new ActionError("not_found", "File not found"); }
 export function unavailable(): ActionError { return new ActionError("internal", "File storage unavailable"); }
@@ -46,7 +47,7 @@ export class Files {
       for await (const chunk of source) {
         signal?.throwIfAborted();
         file.size += chunk.byteLength;
-        if (file.size > max) throw new ActionError("invalid_input", "Upload exceeds configured byte limit");
+        if (file.size > max) throw new ActionError("invalid_input", "Upload exceeds configured byte limit", { issues: [{ path: ["source"], code: "out_of_range" }] });
         hash.update(chunk); yield chunk;
       }
       signal?.throwIfAborted();
@@ -72,7 +73,10 @@ export class Files {
   }
   async list(principal: Principal | undefined, after = "", limit = 20): Promise<FileRecord[]> {
     const owner = requirePrincipal(principal).subject;
-    if (after && !validId(after) || !Number.isInteger(limit) || limit < 1 || limit > 100) throw new ActionError("invalid_input", "Invalid page");
+    const issues = [];
+    if (after && !validId(after)) issues.push({ path: ["after"], code: "invalid_value" as const });
+    if (!Number.isInteger(limit) || limit < 1 || limit > 100) issues.push({ path: ["limit"], code: "out_of_range" as const });
+    if (issues.length) throw new ActionError("invalid_input", "Invalid page", { issues });
     return this.metadata.list(owner, after, limit);
   }
   async download(principal: Principal | undefined, id: string) {
@@ -93,4 +97,37 @@ export class Files {
     await this.blobs.remove(id);
     await this.metadata.finish(id, owner, "deleting");
   }
+}
+
+/** Optional SDK handles over the same native methods; streams never pass through JSON. */
+export function filesModule(files: Files, id = "files") {
+  if (!/^[A-Za-z0-9_-]{1,64}(\.[A-Za-z0-9_-]{1,64}){0,31}$/.test(id)) throw new ActionError("invalid_input", "Invalid Files instance identifier");
+  const action = defineAction<Files>();
+  const upload = action({
+    id: `${id}.upload`, metadata: metadata.actions.upload,
+    authorize(context) { requirePrincipal(context.principal); },
+    run(context, input: { name: string; source: AsyncIterable<Uint8Array> }) { return context.resources.upload(context.principal, input.name, input.source, context.signal); },
+  });
+  const list = action({
+    id: `${id}.list`, metadata: metadata.actions.list,
+    authorize(context) { requirePrincipal(context.principal); },
+    run(context, input: { after?: string; limit?: number }) { return context.resources.list(context.principal, input.after, input.limit); },
+  });
+  const stat = action({
+    id: `${id}.stat`, metadata: metadata.actions.stat,
+    authorize(context) { requirePrincipal(context.principal); },
+    run(context, input: { id: string }) { return context.resources.stat(context.principal, input.id); },
+  });
+  const download = action({
+    id: `${id}.download`, metadata: metadata.actions.download,
+    authorize(context) { requirePrincipal(context.principal); },
+    run(context, input: { id: string }) { return context.resources.download(context.principal, input.id); },
+  });
+  const remove = action({
+    id: `${id}.delete`, metadata: metadata.actions.delete,
+    authorize(context) { requirePrincipal(context.principal); },
+    async run(context, input: { id: string }) { await context.resources.delete(context.principal, input.id); return null; },
+  });
+  const actions = { upload, list, stat, download, delete: remove };
+  return { module: new Module(id, { actions, resources: [`${id}.metadata`, `${id}.content`] }, metadata.module), actions, resources: files };
 }

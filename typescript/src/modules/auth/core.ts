@@ -2,6 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { ActionError, Module, defineAction, emptyInput, requirePrincipal } from "@lenso/app";
 import type { Principal } from "@lenso/app";
 import { z } from "zod";
+import metadata from "./metadata.json" with { type: "json" };
 import { userSchema, validInstanceId } from "./contracts.js";
 import type { AuthResources } from "./contracts.js";
 
@@ -25,14 +26,14 @@ export function authModule(resources: AuthResources, id = "auth") {
   }
   const action = defineAction<AuthResources>();
   const register = action({
-    id: `${id}.register`, input: credentialsInput, output: userSchema,
+    id: `${id}.register`, metadata: metadata.actions.register, input: credentialsInput, output: userSchema,
     authorize() {},
     async run(context, input) {
       return context.resources.store.createUser(input.name.toLowerCase(), await context.resources.passwords.hash(input.password));
     },
   });
   const login = action({
-    id: `${id}.login`, input: credentialsInput, output: z.object({ token: z.string(), expiresMs: z.number().int() }),
+    id: `${id}.login`, metadata: metadata.actions.login, input: credentialsInput, output: z.object({ token: z.string(), expiresMs: z.number().int() }),
     authorize() {},
     async run(context, input) {
       const r = context.resources;
@@ -46,7 +47,7 @@ export function authModule(resources: AuthResources, id = "auth") {
     },
   });
   const session = action({
-    id: `${id}.session`, input: emptyInput, output: userSchema,
+    id: `${id}.session`, metadata: metadata.actions.session, input: emptyInput, output: userSchema,
     authorize(context) { requirePrincipal(context.principal); },
     async run(context) {
       const user = await context.resources.store.user(requirePrincipal(context.principal).subject);
@@ -55,7 +56,7 @@ export function authModule(resources: AuthResources, id = "auth") {
     },
   });
   const logout = action({
-    id: `${id}.logout`, input: tokenInput, output: z.object({ revoked: z.literal(true) }),
+    id: `${id}.logout`, metadata: metadata.actions.logout, input: tokenInput, output: z.object({ revoked: z.literal(true) }),
     async authorize(context, input) {
       const principal = requirePrincipal(context.principal);
       const user = await context.resources.store.session(tokenHash(input.token), time(context.resources));
@@ -67,7 +68,7 @@ export function authModule(resources: AuthResources, id = "auth") {
     },
   });
   const actions = { register, login, session, logout };
-  const module = new Module(id, { actions, resources: [`${id}.store`, `${id}.passwords`] });
+  const module = new Module(id, { actions, resources: [`${id}.store`, `${id}.passwords`] }, metadata.module);
   async function principal(token: string | undefined): Promise<Principal | undefined> {
     if (!token || !/^[0-9a-f]{64}$/.test(token)) return undefined;
     const user = await resources.store.session(tokenHash(token), time(resources));

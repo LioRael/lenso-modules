@@ -37,7 +37,7 @@ prompt="Local content directory"
 kind={type="text"}
 default="data/files"
 [resources]
-files=[{path="rust/src/modules/files/mod.rs",target="mod.rs"}]
+files=[{path="rust/src/modules/files/mod.rs",target="mod.rs"},{path="rust/src/modules/files/metadata.json",target="metadata.json"}]
 local=[{path="rust/src/modules/files/local.rs",target="local.rs"}]
 sqlite=[{path="rust/src/modules/files/sqlite.rs",target="store.rs"},{path="rust/src/modules/files/sqlite.sql",target="sqlite.sql"}]
 postgres=[{path="rust/src/modules/files/postgres.rs",target="store.rs"},{path="rust/src/modules/files/postgres.sql",target="postgres.sql"}]
@@ -57,7 +57,7 @@ context={language="rust",runtime="tokio",app_host="lenso-http-v2"}
 [[generator.dependencies]]
 ecosystem="cargo"
 package="lenso-app"
-version="0.1.1"
+version="0.1.2"
 module="files"
 options={features=["json"]}
 
