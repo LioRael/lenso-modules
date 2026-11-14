@@ -54,7 +54,14 @@ def entry_for(storage):
     text = text.replace('i_61757468("consumer.sqlite")', 'i_61757468()')
     text = text.replace('i_61757468(Some(std::path::Path::new("consumer.sqlite")))?',
                         'i_61757468(None).await?' if storage == 'postgres' else 'i_61757468(None)?')
-    return text.replace('new_current_thread().build()', 'new_current_thread().enable_all().build()')
+    text = text.replace('new_current_thread().build()', 'new_current_thread().enable_all().build()')
+    if local:
+        probe = (root / f'tests/consumers/metadata.{"ts" if a.language == "typescript" else "rs"}').read_text()
+        anchor = 'const user=' if a.language == 'typescript' else ' let user='
+        assert anchor in text, 'native consumer probe anchor missing'
+        text = text.replace(anchor, probe + '\n' + anchor, 1)
+    return text
+
 
 entry.write_text(entry_for(a.storage))
 env = dict(os.environ, LENSO_CACHE_DIR=str(project / 'cache'), AUTH_DATABASE_URL=os.environ['DATABASE_URL'])
@@ -189,5 +196,5 @@ if local:
     run('code', 'update', 'auth', '--yes', expected=1)
 (project / 'verification.json').write_text(json.dumps({'language': a.language, 'storage': a.storage, 'switched_to': other,
     'official': a.official, 'local_modules': local, 'code_version': code_version, 'project_config': True, 'compiled_and_ran': True,
-    'preview_denial_update_offline': True, 'native_cleanup': True, 'data_preserved': True, 'commands': commands}, indent=2) + '\n')
+    'sdk_metadata_and_input_errors': local, 'preview_denial_update_offline': True, 'native_cleanup': True, 'data_preserved': True, 'commands': commands}, indent=2) + '\n')
 print(a.language + '/' + a.storage + ' Auth project configuration and switch passed', flush=True)
