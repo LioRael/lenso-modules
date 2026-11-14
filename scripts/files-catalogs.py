@@ -5,7 +5,7 @@ root=Path(__file__).resolve().parent.parent
 for lang,runtime,ext in [('typescript','node26','ts'),('rust','tokio','rs')]:
  body=f'''schema_version=1
 [modules.files]
-version="0.1.0"
+version="0.1.1"
 [modules.files.supports]
 language=["{lang}"]
 runtime=["{runtime}"]

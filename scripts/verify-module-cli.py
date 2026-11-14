@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import tomllib
 
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--binary', type=Path, required=True)
@@ -22,6 +23,8 @@ if not a.official and not a.code_source:
 if not os.environ.get('DATABASE_URL'):
     p.error('DATABASE_URL must point to a disposable PostgreSQL database for adapter switching')
 root = Path(__file__).resolve().parent.parent
+release = tomllib.loads((root / 'lenso.modules.toml').read_text())['modules']['auth']['releases'][-1]
+expected_version, expected_ref = release['version'], release['reference']
 project = a.out.resolve()
 project.mkdir(parents=True, exist_ok=False)
 (project / 'src').mkdir()
@@ -55,7 +58,7 @@ def entry_for(storage):
     text = text.replace('i_61757468(Some(std::path::Path::new("consumer.sqlite")))?',
                         'i_61757468(None).await?' if storage == 'postgres' else 'i_61757468(None)?')
     text = text.replace('new_current_thread().build()', 'new_current_thread().enable_all().build()')
-    if local:
+    if local or a.official:
         probe = (root / f'tests/consumers/metadata.{"ts" if a.language == "typescript" else "rs"}').read_text()
         anchor = 'const user=' if a.language == 'typescript' else ' let user='
         assert anchor in text, 'native consumer probe anchor missing'
@@ -101,7 +104,7 @@ assert not (project / 'lenso.code.toml').exists()
 run('code', 'config', '--input', json.dumps({'settings': settings}), '--yes')
 config_bytes = (project / 'lenso.code.toml').read_bytes()
 preview = run('code', 'preview', 'auth')['outputs']['resolve']
-assert preview['module']['version'] == '0.4.0'
+assert preview['module']['version'] == expected_version
 assert not (project / 'src/code.modules.json').exists()
 pending = run('code', 'add', 'auth', expected=2)
 answers = project / 'decline.json'
@@ -188,13 +191,20 @@ if local:
     start = original.rfind('[[modules.auth.releases]]\n')
     end = original.find('\n[modules.', start)
     release = original[start:] if end < 0 else original[start:end]
-    directory.write_text(original + '\n' + release.replace('0.4.0', '0.4.1'))
-    assert run('code', 'preview', 'auth')['outputs']['resolve']['module']['version'] == '0.4.0'
+    major, minor, patch = map(int, expected_version.split('.'))
+    next_version = f'{major}.{minor}.{patch + 1}'
+    directory.write_text(original + '\n' + release.replace(expected_version, next_version))
+    assert run('code', 'preview', 'auth')['outputs']['resolve']['module']['version'] == expected_version
     run('code', 'update', 'auth', '--yes')
-    assert run('code', 'preview', '@lenso/auth')['outputs']['resolve']['module']['version'] == '0.4.1'
-    directory.write_text(directory.read_text().replace('reference = "v0.4.1"', 'reference = "moved-tag"'))
+    assert run('code', 'preview', '@lenso/auth')['outputs']['resolve']['module']['version'] == next_version
+    directory.write_text(directory.read_text().replace(f'reference = "v{next_version}"', 'reference = "moved-tag"'))
     run('code', 'update', 'auth', '--yes', expected=1)
+installed = json.loads((project / 'src/code.modules.json').read_text())['modules']['@lenso/auth']
+if a.official and not local:
+    assert installed['version'] == expected_version
+    assert installed['profile']['source'] == 'github-repo:LioRael/lenso-modules'
+    assert installed['profile']['ref'] == expected_ref
 (project / 'verification.json').write_text(json.dumps({'language': a.language, 'storage': a.storage, 'switched_to': other,
     'official': a.official, 'local_modules': local, 'code_version': code_version, 'project_config': True, 'compiled_and_ran': True,
-    'sdk_metadata_and_input_errors': local, 'preview_denial_update_offline': True, 'native_cleanup': True, 'data_preserved': True, 'commands': commands}, indent=2) + '\n')
+    'sdk_metadata_and_input_errors': True, 'module_pin': installed, 'preview_denial_update_offline': True, 'native_cleanup': True, 'data_preserved': True, 'commands': commands}, indent=2) + '\n')
 print(a.language + '/' + a.storage + ' Auth project configuration and switch passed', flush=True)

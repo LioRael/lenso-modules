@@ -13,7 +13,7 @@ for lang in ('typescript','rust'):
              'scrypt':['hasher.ts'] if lang=='typescript' else ['mod.rs']}
     body=f'''schema_version = 1
 [modules.auth]
-version = "0.3.0"
+version = "0.4.1"
 [modules.auth.supports]
 language = ["{lang}"]
 runtime = ["{runtime}"]

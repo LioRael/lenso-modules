@@ -1,7 +1,7 @@
 # Lenso Modules
 
 Editable functional modules built on the published Lenso SDKs. The first module is
-**Auth 0.4.0**: password registration/login and opaque sessions, with independent
+**Auth 0.4.1**: password registration/login and opaque sessions, with independent
 TypeScript and Rust implementations, SQLite/PostgreSQL stores and a bounded scrypt provider.
 
 This repository owns business interfaces, implementations, adapters, templates and
@@ -11,13 +11,13 @@ curated names/presets in [lenso-registry](https://github.com/LioRael/lenso-regis
 No SDK changes are required. Source consumers use `@lenso/app` / `lenso-app` 0.1.2
 from npm/crates.io, not workspace path dependencies.
 
-## Unreleased SDK metadata source
+## SDK metadata release
 
-The working source adds [optional Auth/Files SDK descriptions and input issues](docs/module-metadata.md) using the published SDK 0.1.2. Source-consumer manifests and generated catalogs use the registry packages directly. The module installation examples below refer to existing release tags; this source batch is under review. See the [acceptance record](docs/module-metadata-acceptance.md) for native, HTTP and full CLI verification.
+The working source adds [optional Auth/Files SDK descriptions and input issues](docs/module-metadata.md) using the published SDK 0.1.2. Source-consumer manifests and generated catalogs use the registry packages directly. Auth 0.4.1 and Files 0.1.1 are distributed from source tag `v0.4.1`; see the [release notes](docs/releases/v0.4.1.md). See the [acceptance record](docs/module-metadata-acceptance.md) for native, HTTP and full CLI verification.
 
 ## Private Files
 
-Files 0.1.0 is published with Auth 0.4.0 in module source v0.4.0. App 0.2.0
+Files 0.1.1 is published with Auth 0.4.1 in module source v0.4.1. App 0.2.0
 provides the shared identity and native streaming host. Both languages support
 SQLite/PostgreSQL metadata and local content. See
 [Files behavior, variants and acceptance](docs/files.md).

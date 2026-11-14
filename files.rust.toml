@@ -1,6 +1,6 @@
 schema_version=1
 [modules.files]
-version="0.1.0"
+version="0.1.1"
 [modules.files.supports]
 language=["rust"]
 runtime=["tokio"]

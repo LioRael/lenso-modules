@@ -1,6 +1,6 @@
 schema_version = 1
 [modules.auth]
-version = "0.3.0"
+version = "0.4.1"
 [modules.auth.supports]
 language = ["rust"]
 runtime = ["tokio"]
