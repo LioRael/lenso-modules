@@ -1,0 +1,24 @@
+scripts/verify-module-cli.py
+  s_0a36fa17311984::t_895033bc7b9d5b 57-64,199
+tests/consumers/metadata.rs
+  s_0a36fa17311984::t_895033bc7b9d5b 1-9
+tests/consumers/metadata.ts
+  s_0a36fa17311984::t_895033bc7b9d5b 1-11
+  s_0a36fa17311984::t_2e30c671e26c77 12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "edd1cbc400144da9edc22adb6abd9ffe842b5694",
+  "prompts": {},
+  "sessions": {
+    "s_0a36fa17311984": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1daa8-3fb7-7c03-beac-1e3b4a74162a",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "LioRael <leo@lenso.dev>"
+    }
+  }
+}
