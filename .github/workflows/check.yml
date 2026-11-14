@@ -14,7 +14,7 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run lint
-      - run: python3 scripts/catalogs.py && git diff --exit-code
+      - run: python3 scripts/catalogs.py && python3 scripts/files-catalogs.py && git diff --exit-code
   rust:
     runs-on: ubuntu-24.04
     steps:

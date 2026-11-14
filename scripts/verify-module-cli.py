@@ -94,7 +94,7 @@ assert not (project / 'lenso.code.toml').exists()
 run('code', 'config', '--input', json.dumps({'settings': settings}), '--yes')
 config_bytes = (project / 'lenso.code.toml').read_bytes()
 preview = run('code', 'preview', 'auth')['outputs']['resolve']
-assert preview['module']['version'] == '0.3.0'
+assert preview['module']['version'] == '0.4.0'
 assert not (project / 'src/code.modules.json').exists()
 pending = run('code', 'add', 'auth', expected=2)
 answers = project / 'decline.json'
@@ -180,11 +180,11 @@ if local:
     # Copy the entire latest release, including its language targets.
     start = original.rfind('[[modules.auth.releases]]\n')
     release = original[start:]
-    directory.write_text(original + '\n' + release.replace('0.3.0', '0.3.1'))
-    assert run('code', 'preview', 'auth')['outputs']['resolve']['module']['version'] == '0.3.0'
+    directory.write_text(original + '\n' + release.replace('0.4.0', '0.4.1'))
+    assert run('code', 'preview', 'auth')['outputs']['resolve']['module']['version'] == '0.4.0'
     run('code', 'update', 'auth', '--yes')
-    assert run('code', 'preview', '@lenso/auth')['outputs']['resolve']['module']['version'] == '0.3.1'
-    directory.write_text(directory.read_text().replace('reference = "v0.3.1"', 'reference = "moved-tag"'))
+    assert run('code', 'preview', '@lenso/auth')['outputs']['resolve']['module']['version'] == '0.4.1'
+    directory.write_text(directory.read_text().replace('reference = "v0.4.1"', 'reference = "moved-tag"'))
     run('code', 'update', 'auth', '--yes', expected=1)
 (project / 'verification.json').write_text(json.dumps({'language': a.language, 'storage': a.storage, 'switched_to': other,
     'official': a.official, 'local_modules': local, 'code_version': code_version, 'project_config': True, 'compiled_and_ran': True,

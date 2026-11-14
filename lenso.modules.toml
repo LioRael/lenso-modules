@@ -58,3 +58,60 @@ language="rust"
 runtime="tokio"
 catalog="auth.rust.app.toml"
 when={app_host="lenso-http-v1"}
+
+[[modules.auth.releases]]
+version = "0.4.0"
+reference = "v0.4.0"
+
+[[modules.auth.releases.targets]]
+language = "typescript"
+runtime = "node26"
+catalog = "auth.typescript.toml"
+
+[[modules.auth.releases.targets]]
+language = "rust"
+runtime = "tokio"
+catalog = "auth.rust.toml"
+
+[[modules.auth.releases.targets]]
+language="typescript"
+runtime="node26"
+catalog="auth.typescript.app.toml"
+when={app_host="lenso-http-v1"}
+
+[[modules.auth.releases.targets]]
+language="rust"
+runtime="tokio"
+catalog="auth.rust.app.toml"
+when={app_host="lenso-http-v1"}
+
+[[modules.auth.releases.targets]]
+language="typescript"
+runtime="node26"
+catalog="auth.typescript.app-v2.toml"
+when={app_host="lenso-http-v2"}
+
+[[modules.auth.releases.targets]]
+language="rust"
+runtime="tokio"
+catalog="auth.rust.app-v2.toml"
+when={app_host="lenso-http-v2"}
+
+[modules.files]
+description="Private files with scoped metadata and streamed local content"
+root="files"
+[[modules.files.releases]]
+version="0.1.0"
+reference="v0.4.0"
+
+[[modules.files.releases.targets]]
+language="typescript"
+runtime="node26"
+catalog="files.typescript.toml"
+when={app_host="lenso-http-v2"}
+
+[[modules.files.releases.targets]]
+language="rust"
+runtime="tokio"
+catalog="files.rust.toml"
+when={app_host="lenso-http-v2"}
