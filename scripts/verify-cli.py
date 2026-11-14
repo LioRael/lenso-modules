@@ -110,7 +110,8 @@ native={cargo={manifest="Cargo.toml"}}
  config=run('config')['outputs']['main']['config']['cli']
  selected=next(x for x in config['extensions'] if x['id']=='code')
  assert selected['options']['selection']['language']==language
- assert run('code','validate')['outputs']['validate']['validated']
+ validated=run('code','validate')['outputs']['validate']
+ assert validated['validated'] and {sample['sample'] for sample in validated['samples']}=={'default','multiple','postgres'}
  sample='postgres' if storage=='postgres' else 'default'
  intent=json.dumps({'instances':{'auth':'auth'}})
  choice=run('code','compose-preview','--input',intent,'--yes',expected=2)
