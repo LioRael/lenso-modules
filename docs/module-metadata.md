@@ -1,6 +1,6 @@
 # Optional Auth/Files descriptions and input issues
 
-This is unreleased module source for the SDK metadata contract at `LioRael/lenso` commit `9d5edceb8d206b46b2c337ff77caebdc9927f8a8`. Published SDK 0.1.1 does not provide the required metadata/error APIs. Existing release tags and their published dependency declarations are unchanged. Do not release these module catalogs against SDK 0.1.1: publish a compatible SDK first, then update the source-consumer and generated dependency declarations together. Ordinary checks against the old installed SDK cannot validate these additions.
+This module source uses published `@lenso/app` / `lenso-app` 0.1.2, released by [SDK workflow 43639576110](https://github.com/LioRael/lenso/actions/runs/43639576110). Source-consumer manifests, lockfiles and generated catalogs require the compatible registry SDK; no local SDK checkout or Cargo path override is required. Existing module release tags remain unchanged until this module source is released. Published SDK 0.1.1 lacks the required metadata/error APIs.
 
 ## Descriptions
 
@@ -34,16 +34,16 @@ Reference and generated Action error adapters serialize SDK `toJSON()`/`public()
 
 SDK schemas are annotations. Native parser/invariant logic and Access remain authoritative. Explicit application messages/issues are author-owned public data; the SDK does not scrub an arbitrary application debug dump. No actual passwords, bearer tokens, storage paths, hashes from live credentials or provider connection strings belong in metadata.
 
-## Reproduce validation without changing release dependencies
+## Reproduce registry-consumer validation
 
-With Node.js 26, Rust 1.99 and the reviewed SDK checkout (with its npm dependencies installed):
+With Node.js 26 and Rust 1.99:
 
 ```sh
-python3 scripts/verify-sdk-metadata.py --sdk /path/to/lenso
+python3 scripts/verify-sdk-metadata.py
 ```
 
-The script copies module sources to a temporary consumer, builds/packs the reviewed SDK, installs its App archive without saving manifests/locks, and applies an invocation-local Cargo crates.io patch inside that consumer. All standard Rust checks use the installed native Cargo with empty wrappers. No global Cargo configuration or project release dependencies are changed. Results and per-command logs are written under ignored `.local/module-metadata`; temporary consumers are removed. The isolated dependency lock may resolve the SDK's additional optional dependency; it is never written back to the module repository.
+The script copies module sources to a temporary consumer, installs the committed npm lock with `npm ci`, and runs standard Rust check/test/Clippy/docs/format/build with the committed registry Cargo lock. Rust uses native Cargo with empty wrappers. Results and per-command logs are written under ignored `.local/module-metadata`; temporary consumers are removed. It checks the installed App version and compares the actual TS/Rust reports. No SDK source patch, local package archive or global configuration change is involved.
 
-Set `AUTH_POSTGRES_URL` to a disposable database to also run the existing TS/Rust PostgreSQL acceptance. The normal Rust suite explicitly skips its environment-dependent PostgreSQL test; the extra pass runs it with `--ignored`. Generated CLI install/upgrade workflows and remote Linux/macOS CI are separate checks and have not been run for this source batch. Their source-consumer jobs must use the same reviewed SDK override until a compatible registry release exists. Published-only consumers must continue using the existing release tags during that interval.
+Set `AUTH_POSTGRES_URL` to a disposable database to include existing TS/Rust PostgreSQL acceptance. The normal Rust suite explicitly skips its environment-dependent PostgreSQL test; the extra pass runs it with `--ignored`.
 
-See the [local acceptance record](module-metadata-acceptance.md) for results and limits.
+The standard CI runs TypeScript, Rust and real-process integration on Linux/macOS. The complete CLI matrix runs both languages on both platforms, with SQLite/PostgreSQL, published CLI installation, Auth module updates, independent Files generation and App 0.1.0 upgrades. It records actual installed npm/Cargo SDK versions and verifies registry resolution. See the [acceptance record](module-metadata-acceptance.md) for completed runs and their limits.

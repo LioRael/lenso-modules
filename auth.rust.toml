@@ -59,7 +59,7 @@ context = {language="rust", runtime="tokio"}
 [[generator.dependencies]]
 ecosystem="cargo"
 package="lenso-app"
-version="0.1.1"
+version="0.1.2"
 module="auth"
 options={features=["json"]}
 
@@ -69,6 +69,13 @@ package="serde"
 version="1"
 module="auth"
 options={features=["derive"]}
+
+[[generator.dependencies]]
+ecosystem="cargo"
+package="serde_json"
+version="1"
+module="auth"
+options={}
 
 [[generator.dependencies]]
 ecosystem="cargo"

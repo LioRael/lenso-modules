@@ -59,7 +59,7 @@ context = {language="typescript", runtime="node26"}
 [[generator.dependencies]]
 ecosystem="npm"
 package="@lenso/app"
-version="0.1.1"
+version="0.1.2"
 module="auth"
 options={}
 

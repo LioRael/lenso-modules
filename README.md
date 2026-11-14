@@ -8,12 +8,12 @@ This repository owns business interfaces, implementations, adapters, templates a
 behavioral fixtures. SDK primitives live in [lenso](https://github.com/LioRael/lenso),
 installation/generation in [lenso-cli](https://github.com/LioRael/lenso-cli), and
 curated names/presets in [lenso-registry](https://github.com/LioRael/lenso-registry).
-No SDK changes are required. Source consumers use `@lenso/app` / `lenso-app` 0.1.1
+No SDK changes are required. Source consumers use `@lenso/app` / `lenso-app` 0.1.2
 from npm/crates.io, not workspace path dependencies.
 
 ## Unreleased SDK metadata source
 
-The working source adds [optional Auth/Files SDK descriptions and input issues](docs/module-metadata.md). It requires the reviewed SDK metadata APIs, which are not in published SDK 0.1.1. Use the isolated verification script in that guide for this batch; the published installation instructions below refer to existing release tags. Release dependencies/catalog versions stay unchanged until a compatible SDK is published. [Local acceptance](docs/module-metadata-acceptance.md) covers both native languages and real HTTP streaming.
+The working source adds [optional Auth/Files SDK descriptions and input issues](docs/module-metadata.md) using the published SDK 0.1.2. Source-consumer manifests and generated catalogs use the registry packages directly. The module installation examples below refer to existing release tags; this source batch is under review. See the [acceptance record](docs/module-metadata-acceptance.md) for native, HTTP and full CLI verification.
 
 ## Private Files
 
