@@ -1,0 +1,57 @@
+scripts/record-sdk-consumers.py
+  s_0a36fa17311984::t_bbea80d0ebd5be 15,19
+  s_0a36fa17311984::t_96a0debdd7bf6e 14,17,38-43
+.github/workflows/verify-module-install.yml
+  s_0a36fa17311984::t_6829d5f639934d 30
+  s_0a36fa17311984::t_bbea80d0ebd5be 88,93,101-109,111-113,115-118,137
+  s_0a36fa17311984::t_3a835eae9e79dd 37-46,81
+docs/releases/v0.4.1.md
+  s_0a36fa17311984::t_14bbe870b0d5f3 1-4,6-13,18-20,22-28,30-31
+  s_0a36fa17311984::t_bbea80d0ebd5be 5,14-17,21
+  s_0a36fa17311984::t_6829d5f639934d 29
+README.md
+  s_0a36fa17311984::t_14bbe870b0d5f3 4,14,16,20
+.github/workflows/verify-install.yml
+  s_0a36fa17311984::t_3a835eae9e79dd 8-14,22,30,33-38,40,42
+  s_0a36fa17311984::t_96a0debdd7bf6e 31-32,43-45
+auth.rust.app-v2.toml
+  s_0a36fa17311984::t_37aad3858344f9 3
+auth.rust.app.toml
+  s_0a36fa17311984::t_6a782db058910a 3
+auth.rust.toml
+  s_0a36fa17311984::t_3b2c7cc9877785 3
+auth.typescript.app-v2.toml
+  s_0a36fa17311984::t_c09b07ac896869 3
+auth.typescript.app.toml
+  s_0a36fa17311984::t_e841737098f567 3
+auth.typescript.toml
+  s_0a36fa17311984::t_34168cb81b4d52 3
+files.rust.toml
+  s_0a36fa17311984::t_49234df075c1d8 3
+files.typescript.toml
+  s_0a36fa17311984::t_416fffabe188f1 3
+lenso.modules.toml
+  s_0a36fa17311984::t_b08e5ce8229c08 100-137,156-171
+scripts/catalogs.py
+  s_0a36fa17311984::t_9e76840f64af46 16
+scripts/files-catalogs.py
+  s_0a36fa17311984::t_4c8aeeb751fb78 8
+scripts/verify-module-cli.py
+  s_0a36fa17311984::t_839eb0dd6d4d15 9,26-27,61,107,194-197,199-200,202-206,209
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c92a73bd9ef4d68dd7f371d9dcb33b56b9f9bf1d",
+  "prompts": {},
+  "sessions": {
+    "s_0a36fa17311984": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1daa8-3fb7-7c03-beac-1e3b4a74162a",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "LioRael <leo@lenso.dev>"
+    }
+  }
+}
