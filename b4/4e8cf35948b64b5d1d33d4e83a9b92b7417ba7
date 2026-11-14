@@ -1,0 +1,33 @@
+docs/module-metadata-acceptance.md
+  s_0a36fa17311984::t_d34a9bc4e4a78c 3-33,54
+docs/module-metadata-acceptance/sdk-release.json
+  s_0a36fa17311984::t_bc88b23dc28a50 1-49
+docs/module-metadata-acceptance/cross-platform.json
+  s_0a36fa17311984::t_41d8787d22a4ed 1-903
+docs/module-metadata-acceptance/registry-macos/verification.json
+  s_0a36fa17311984::t_955b239741e2eb 1-23
+docs/module-metadata-acceptance/registry-macos/typescript.json
+  s_0a36fa17311984::t_955b239741e2eb 1-909
+docs/module-metadata-acceptance/registry-macos/rust.json
+  s_0a36fa17311984::t_955b239741e2eb 1-909
+docs/module-metadata-acceptance/registry-macos/integration.log
+  s_0a36fa17311984::t_955b239741e2eb 1-16
+docs/module-metadata.md
+  s_0a36fa17311984::t_9a60ba728b2254 49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b44e8cf35948b64b5d1d33d4e83a9b92b7417ba7",
+  "prompts": {},
+  "sessions": {
+    "s_0a36fa17311984": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1daa8-3fb7-7c03-beac-1e3b4a74162a",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "LioRael <leo@lenso.dev>"
+    }
+  }
+}
