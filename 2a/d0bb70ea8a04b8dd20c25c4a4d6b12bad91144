@@ -1,0 +1,125 @@
+rust/src/modules/files/postgres.rs
+  s_c5695907fe744f::t_4c8a57544e3804 1,3,15,30,82-83,124
+  s_c5695907fe744f::t_d8278dc5e76c0a 2,4-14,16-29,31-81,84-123
+rust/src/modules/files/mod.rs
+  s_c5695907fe744f::t_30903fc2ce52c7 1-4,9-13,21,94,108-109,256
+  s_c5695907fe744f::t_d8278dc5e76c0a 5-8,14-20,22-46,48-76,78-82,92,100,104,106-107,110-202,205-255
+  s_c5695907fe744f::t_6b5e2609728537 47,77,83-91,93,95-99,101-103,105,203-204
+lenso.modules.toml
+  s_c5695907fe744f::t_7acb7875b51144 61-98
+  s_c5695907fe744f::t_b3aa791229d8ae 99-117
+templates/host-v2.toml.j2
+  s_c5695907fe744f::t_7acb7875b51144 1-2
+typescript/src/modules/files/local.ts
+  s_c5695907fe744f::t_4c8a57544e3804 4-5
+  s_c5695907fe744f::t_6f93c9bd0c5be8 1-3,6-12,15-39
+  s_c5695907fe744f::t_30903fc2ce52c7 13-14
+typescript/tests/files.test.mjs
+  s_c5695907fe744f::t_f33ca917040324 34-37
+  s_c5695907fe744f::t_062212c7c661b9 1-28,38-47
+  s_c5695907fe744f::t_2ceb1a7f22aa10 29-33
+README.md
+  s_c5695907fe744f::t_1974edfa87a078 14-21
+templates/files-host.toml.j2
+  s_c5695907fe744f::t_4c8a57544e3804 1-2
+scripts/files-catalogs.py
+  s_c5695907fe744f::t_b3aa791229d8ae 1-49,51-76
+  s_c5695907fe744f::t_062212c7c661b9 50
+templates/rust/files.rs.j2
+  s_c5695907fe744f::t_4c8a57544e3804 1-7,9-15,17-18,20-21,25-27,30-32,34-37,39-41,43-45,48,52-57,59-66,68-70
+  s_c5695907fe744f::t_07a83bb1ebde51 8,28,38,42,47,58,67
+  s_c5695907fe744f::t_a98908702ba9c7 19,33,46,49-51
+  s_c5695907fe744f::t_9b68f108c67b98 22-24,29
+  s_c5695907fe744f::t_d8278dc5e76c0a 16
+scripts/catalogs.py
+  s_c5695907fe744f::t_e84d07db544aa1 106-111
+typescript/src/modules/files/postgres.ts
+  s_c5695907fe744f::t_6f93c9bd0c5be8 1,4-30,40-42
+  s_c5695907fe744f::t_4c8a57544e3804 2-3
+  s_c5695907fe744f::t_9428a9e5776160 31-33,39
+  s_c5695907fe744f::t_f4faae8b44cfe0 34-38
+rust/src/lib.rs
+  s_c5695907fe744f::t_30903fc2ce52c7 4
+  s_c5695907fe744f::t_d8278dc5e76c0a 5-12
+rust/src/modules/files/sqlite.sql
+  s_c5695907fe744f::t_30903fc2ce52c7 1-8
+rust/src/modules/files/local.rs
+  s_c5695907fe744f::t_30903fc2ce52c7 1,8,12,42-43,85
+  s_c5695907fe744f::t_d8278dc5e76c0a 2-7,9-11,13-41,44-84
+templates/rust/host-v2.rs.j2
+  s_c5695907fe744f::t_7acb7875b51144 1-174
+rust/src/modules/files/sqlite.rs
+  s_c5695907fe744f::t_30903fc2ce52c7 1,8,23,82-83,129
+  s_c5695907fe744f::t_d8278dc5e76c0a 2-7,9-22,24-48,50-67,70-81,84,87-88,91-92,95-96,99,102-103,106-117,121,123-128
+  s_c5695907fe744f::t_bcb709b7f971bc 49,68-69,85-86,89-90,93-94,97-98,100-101,104-105,118-120,122
+typescript/src/modules/files/sqlite-schema.ts
+  s_c5695907fe744f::t_6f93c9bd0c5be8 1
+auth.rust.app-v2.toml
+  s_c5695907fe744f::t_b3aa791229d8ae 152
+  s_c5695907fe744f::t_7acb7875b51144 1-151,153-166
+contracts/files/postgres-v1.sql
+  s_c5695907fe744f::t_6f93c9bd0c5be8 1-8
+templates/typescript/files.ts.j2
+  s_c5695907fe744f::t_07a83bb1ebde51 34
+  s_c5695907fe744f::t_4c8a57544e3804 1-33,35-51
+rust/Cargo.toml
+  s_c5695907fe744f::t_30903fc2ce52c7 13,24-25
+  s_c5695907fe744f::t_e6faf5ed0469e1 26
+scripts/verify-module-cli.py
+  s_c5695907fe744f::t_d7443e476616db 97,183-184,186-187
+auth.typescript.app-v2.toml
+  s_c5695907fe744f::t_7acb7875b51144 1-96
+typescript/src/modules/files/core.ts
+  s_c5695907fe744f::t_6f93c9bd0c5be8 1-13,16-22,28-29,31-60,62-68,72-80,87,89-96
+  s_c5695907fe744f::t_30903fc2ce52c7 23-27,69-71
+  s_c5695907fe744f::t_e84d07db544aa1 30
+  s_c5695907fe744f::t_9428a9e5776160 14,61
+  s_c5695907fe744f::t_596c2983164ee3 15,81-86,88
+contracts/files/sqlite-v1.sql
+  s_c5695907fe744f::t_6f93c9bd0c5be8 1-8
+typescript/src/modules/files/postgres-schema.ts
+  s_c5695907fe744f::t_6f93c9bd0c5be8 1
+files.typescript.toml
+  s_c5695907fe744f::t_062212c7c661b9 42-43
+  s_c5695907fe744f::t_b3aa791229d8ae 1-41,44-83
+typescript/src/modules/files/sqlite.ts
+  s_c5695907fe744f::t_6f93c9bd0c5be8 1,4-24,26-27,29-32,41-46
+  s_c5695907fe744f::t_4c8a57544e3804 2-3
+  s_c5695907fe744f::t_9428a9e5776160 33-35
+  s_c5695907fe744f::t_30903fc2ce52c7 25,28
+  s_c5695907fe744f::t_74be6533ab1092 36-40
+rust/src/modules/files/postgres.sql
+  s_c5695907fe744f::t_30903fc2ce52c7 1-8
+docs/files.md
+  s_c5695907fe744f::t_1974edfa87a078 1-114
+files.rust.toml
+  s_c5695907fe744f::t_b3aa791229d8ae 1-153
+rust/tests/files.rs
+  s_c5695907fe744f::t_d8278dc5e76c0a 1-149
+  s_c5695907fe744f::t_f33ca917040324 150-162,164-199
+  s_c5695907fe744f::t_a90f193f3bfb7e 163
+templates/typescript/host-v2.ts.j2
+  s_c5695907fe744f::t_7acb7875b51144 1-43
+.github/workflows/check.yml
+  s_c5695907fe744f::t_89be0379c1b50b 17
+.github/workflows/verify-module-install.yml
+  s_c5695907fe744f::t_2a03f71e6d41d1 7-9,40,81-93,100-101
+rust/Cargo.lock
+  s_c5695907fe744f::t_bcda3763e9b588 5-10,134-163,305,368-378,610-637,671,685,741-746,777,1085-1095,1125,1298,1366,1408,1672-1689,1699-1837
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2ad0bb70ea8a04b8dd20c25c4a4d6b12bad91144",
+  "prompts": {},
+  "sessions": {
+    "s_c5695907fe744f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1d06d-149b-7062-aa67-3c0145df9d90",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "LioRael <leo@lenso.dev>"
+    }
+  }
+}
