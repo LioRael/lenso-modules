@@ -13,7 +13,7 @@ from npm/crates.io, not workspace path dependencies.
 
 ## SDK metadata release
 
-The working source adds [optional Auth/Files SDK descriptions and input issues](docs/module-metadata.md) using the published SDK 0.1.2. Source-consumer manifests and generated catalogs use the registry packages directly. Auth 0.4.1 and Files 0.1.1 are distributed from source tag `v0.4.1`; see the [release notes](docs/releases/v0.4.1.md). See the [acceptance record](docs/module-metadata-acceptance.md) for native, HTTP and full CLI verification.
+Auth 0.4.1 / Files 0.1.1 add [optional Auth/Files SDK descriptions and input issues](docs/module-metadata.md) using the published SDK 0.1.2. Source-consumer manifests and generated catalogs use the registry packages directly. Auth 0.4.1 and Files 0.1.1 are distributed from source tag `v0.4.1`; see the [release notes](docs/releases/v0.4.1.md). See the [official release acceptance](docs/releases/v0.4.1-verification.md) for public installation/upgrades and the [source acceptance record](docs/module-metadata-acceptance.md) for native/HTTP regressions.
 
 ## Private Files
 
@@ -66,12 +66,13 @@ then chooses `auth.typescript.app-v2.toml` or `auth.rust.app-v2.toml`. These add
 HTTP transport templates over the same SDK-backed business source. The reusable
 base catalogs remain available without that convention. Initial App transport
 mounts one root instance named `auth`; custom multi-instance hosts use the base
-catalogs. SDK and CLI Runtime require no changes. App/Code/module releases and the
-official Registry must be synchronized before using these commands publicly.
+catalogs. These source catalogs use App SDK 0.1.2. App 0.2.0 and the native CLI
+Runtime remain unchanged; the official Registry selects the published modules.
 
 ## Install in a prepared application
 
-Requires Code 0.3.6 and a prepared native application. Install the extension once,
+Requires Code 0.3.6 or newer and a prepared native application. Use Code 0.3.8
+for existing Auth/Files pair upgrades; see the release migration notes. Install the extension once,
 then add functional modules through Code:
 
 ```sh
@@ -237,7 +238,7 @@ Packages in this repository are private build/test consumers. Functional source 
 distributed from immutable Git snapshots; it is not an npm/crates.io Auth package.
 
 `scripts/verify-module-cli.py` is the primary module-directory acceptance. It uses
-Code 0.3.6, project language/runtime/path/provider/option defaults, real compilation
+the installed Code release, project language/runtime/path/provider/option defaults, real compilation
 and database actions, then switches storage in both directions without clearing
 Auth settings. It checks denied plans, retained defaults, source/dependency cleanup,
 data preservation, customization-preserving updates and offline replay. Its four

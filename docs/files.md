@@ -1,15 +1,15 @@
 # Private Files v1
 
-Status: published Files 0.1.0 and Auth 0.4.0 from module source v0.4.0, with
-App 0.2.0 host protocol v2 and Code 0.3.6. The official app preset and Registry
+Status: published Files 0.1.1 and Auth 0.4.1 from module source v0.4.1, with
+App 0.2.0 host protocol v2 and Code 0.3.8. The official app preset and Registry
 select the compatible extension versions. Files remains a Code module.
-The SDK and CLI Runtime are unchanged.
+The native CLI Runtime is unchanged; generated source uses App SDK 0.1.2.
 
 ## Ownership and variants
 
 Files owns metadata, binary content lifecycle, owner-scoped operations, migrations
 and native HTTP adapters. TypeScript/Node.js 26 and Rust/Tokio are independent
-implementations over published `@lenso/app` / `lenso-app` 0.1.1. The core uses SDK
+implementations over published `@lenso/app` / `lenso-app` 0.1.2. The core uses SDK
 trusted-principal checks; client JSON/query fields never establish identity.
 
 Two independently selected ports separate metadata from content:
@@ -110,6 +110,6 @@ Native unit tests inject failed commits/removals, lost acknowledgements, task
 cancellation and outside-root symlinks. No S3, sharing, organization roles, resumable
 upload, scanning, Console UI or automatic data migration is advertised.
 
-## Unreleased optional SDK descriptions
+## Optional SDK descriptions
 
-The source batch adds optional native SDK Actions over the existing streaming Files methods, public field issues and reusable Module metadata. See the [source guide](module-metadata.md) and [acceptance record](module-metadata-acceptance.md). Published installation/upgrade results above describe the released baseline, not a new release of these APIs.
+Files 0.1.1 adds optional native SDK Actions over the existing streaming Files methods, public field issues and reusable Module metadata. See the [source guide](module-metadata.md), [release and migration notes](releases/v0.4.1.md) and [official acceptance record](releases/v0.4.1-verification.md). Existing Auth/Files pairs use the explicit SDK patch migration before removing the temporary override.

@@ -1,5 +1,7 @@
 # Auth/Files SDK metadata acceptance
 
+The original pre-release results below are retained as historical evidence. Released Auth 0.4.1 / Files 0.1.1 installation and upgrade checks are recorded in the [official release acceptance](releases/v0.4.1-verification.md).
+
 ## SDK publication and registry consumers
 
 The compatible SDK is published: `@lenso/app` 0.1.2, `lenso-app` 0.1.2 and `@lenso/console` 3.1.0. [SDK publication 43639576110](https://github.com/LioRael/lenso/actions/runs/43639576110) completed through OIDC trusted publishing; npm provenance and crates.io trusted publisher data identify source commit `13a83df807cbd6ca520954dc2c1b35c2b7d52107`. SQLite SDK packages retain 0.1.1. Module manifests, npm/Cargo locks and generated Auth/Files catalogs now use registry App 0.1.2. The temporary SDK override has been removed.
@@ -26,7 +28,7 @@ Both stores' upgrades retain an existing authenticated session and user host cus
 
 Coverage fixes in this delivery include adding Auth's direct serde_json dependency to generated Rust catalogs, building the new metadata fixture binary for integration, and removing the prerelease SDK override. The inherited upgrade command previously defaulted to SQLite despite the fresh-install matrix covering both stores. It now explicitly requests both stores; an eight-project-per-job gate rejects missing cases. Earlier superseded partial runs were canceled and are not counted as complete acceptance.
 
-Module/Registry releases remain unchanged. Windows, physical devices, production deployments and LLM tool-selection quality are outside these checks. This batch does not add a Console UI or a standalone MCP service.
+At the time of this pre-release run, Module/Registry releases remained unchanged. Windows, physical devices, production deployments and LLM tool-selection quality are outside these checks. This batch does not add a Console UI or a standalone MCP service.
 
 ## Initial source validation
 

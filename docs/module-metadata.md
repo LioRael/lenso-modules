@@ -1,6 +1,6 @@
 # Optional Auth/Files descriptions and input issues
 
-This module source uses published `@lenso/app` / `lenso-app` 0.1.2, released by [SDK workflow 43639576110](https://github.com/LioRael/lenso/actions/runs/43639576110). Source-consumer manifests, lockfiles and generated catalogs require the compatible registry SDK; no local SDK checkout or Cargo path override is required. Existing module release tags remain unchanged until this module source is released. Published SDK 0.1.1 lacks the required metadata/error APIs.
+This module source uses published `@lenso/app` / `lenso-app` 0.1.2, released by [SDK workflow 43639576110](https://github.com/LioRael/lenso/actions/runs/43639576110). Source-consumer manifests, lockfiles and generated catalogs require the compatible registry SDK; no local SDK checkout or Cargo path override is required. Auth 0.4.1 and Files 0.1.1 are published from immutable source tag `v0.4.1`; see the [release and migration notes](releases/v0.4.1.md) and [official acceptance record](releases/v0.4.1-verification.md). Published SDK 0.1.1 lacks the required metadata/error APIs.
 
 ## Descriptions
 
@@ -46,4 +46,4 @@ The script copies module sources to a temporary consumer, installs the committed
 
 Set `AUTH_POSTGRES_URL` to a disposable database to include existing TS/Rust PostgreSQL acceptance. The normal Rust suite explicitly skips its environment-dependent PostgreSQL test; the extra pass runs it with `--ignored`.
 
-The standard CI runs TypeScript, Rust and real-process integration on Linux/macOS. The complete CLI matrix runs both languages on both platforms, with SQLite/PostgreSQL, published CLI installation, Auth module updates, independent Files generation and App 0.1.0 upgrades. It records actual installed npm/Cargo SDK versions and verifies registry resolution. All four full CLI jobs and eight source jobs passed; see the [acceptance record](module-metadata-acceptance.md#hosted-cross-platform-acceptance) for the 32 registry projects and tested limits.
+The standard CI runs TypeScript, Rust and real-process integration on Linux/macOS. The complete CLI matrix runs both languages on both platforms, with SQLite/PostgreSQL, published CLI installation, Auth module updates, independent Files generation and App 0.1.0 upgrades. It records actual installed npm/Cargo SDK versions and verifies registry resolution. The pre-release source matrix passed four full CLI jobs and eight source jobs; see the [historical acceptance record](module-metadata-acceptance.md#hosted-cross-platform-acceptance) for those 32 registry projects. Released Registry installation, legacy preset compatibility and existing module-pair upgrades are recorded separately in the [official release acceptance](releases/v0.4.1-verification.md).
