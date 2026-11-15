@@ -67,7 +67,7 @@ def entry_for(storage):
 
 
 entry.write_text(entry_for(a.storage))
-env = dict(os.environ, LENSO_CACHE_DIR=str(project / 'cache'), AUTH_DATABASE_URL=os.environ['DATABASE_URL'])
+env = dict(os.environ, LENSO_CACHE_DIR=os.environ.get('LENSO_CACHE_DIR', str(project / 'cache')), AUTH_DATABASE_URL=os.environ['DATABASE_URL'])
 # Share native dependencies across these sequential fixtures, not application state.
 env['CARGO_TARGET_DIR'] = str(project.parent / 'native-target')
 commands = []

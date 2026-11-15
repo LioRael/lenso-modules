@@ -1,6 +1,16 @@
 name: Verify Code module installation
 on:
   workflow_dispatch:
+    inputs:
+      cli_version:
+        description: Published native CLI version
+        type: choice
+        options: ['1.1.2', '1.0.0']
+        default: '1.1.2'
+      rust_only:
+        description: Resume Rust acceptance after successful TypeScript jobs
+        type: boolean
+        default: false
   pull_request:
     paths:
       - 'auth.*.toml'
@@ -16,18 +26,20 @@ permissions:
 jobs:
   install:
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 40
+    timeout-minutes: 110
+    env:
+      LENSO_CACHE_DIR: ${{ runner.temp }}/lenso-official-cache
     strategy:
       fail-fast: false
       matrix:
-        language: [typescript, rust]
+        language: ${{ fromJSON(inputs.rust_only && '["rust"]' || '["typescript", "rust"]') }}
         os: [ubuntu-24.04, macos-15]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/checkout@v7
         with:
           repository: LioRael/lenso-cli
-          ref: 86d615ad3f2cf6ef20dd95fa81df38884c2e3a6c
+          ref: cb9da9bbbf1920ae2711ababd0a32364365066b7
           path: dist/cli-source
           persist-credentials: false
       - uses: actions/setup-node@v4
@@ -44,11 +56,28 @@ jobs:
           with open(os.environ['GITHUB_ENV'], 'a') as output:
               output.write(f"AUTH_MODULE_VERSION={auth['version']}\nFILES_MODULE_VERSION={files['version']}\nMODULE_SOURCE_REF={auth['reference']}\n")
           PYTHON
+      - name: Wait for official GitHub API budget
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PYTHON'
+          import json, os, time, urllib.request
+          request = urllib.request.Request('https://api.github.com/rate_limit', headers={'Authorization': 'Bearer ' + os.environ['GITHUB_TOKEN'], 'Accept': 'application/vnd.github+json'})
+          with urllib.request.urlopen(request, timeout=30) as response:
+              core = json.load(response)['resources']['core']
+          print(f"GitHub core budget: {core['remaining']}/{core['limit']}; reset {core['reset']}", flush=True)
+          if core['remaining'] < 200:
+              delay = max(0, core['reset'] - int(time.time())) + 2
+              assert delay <= 3602, delay
+              print(f'Waiting {delay}s for the server quota reset', flush=True)
+              time.sleep(delay)
+          PYTHON
       - name: Start disposable PostgreSQL 18
         run: bash scripts/ci-postgres.sh
       - name: Install published CLI
         run: |
-          curl -fsSL --retry 2 https://github.com/LioRael/lenso-cli/releases/download/v1.1.2/install.sh -o "$RUNNER_TEMP/install.sh"
+          curl -fsSL --retry 2 https://github.com/LioRael/lenso-cli/releases/download/v${{ inputs.cli_version || '1.1.2' }}/install.sh -o "$RUNNER_TEMP/install.sh"
           sh "$RUNNER_TEMP/install.sh" --prefix "$RUNNER_TEMP/bin"
       - name: Build reviewed App and Code sources for PR consumers
         if: github.event_name == 'pull_request'
