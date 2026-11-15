@@ -1,0 +1,37 @@
+README.md
+  s_0a36fa17311984::t_cff66aa0e16851 16,69-70,74-75,241
+docs/module-metadata.md
+  s_0a36fa17311984::t_b34158d86d2600 49
+  s_0a36fa17311984::t_cff66aa0e16851 3
+docs/releases/v0.4.1-verification.md
+  s_0a36fa17311984::t_b34158d86d2600 39
+  s_0a36fa17311984::t_ad9ca39c15b2df 1-12,19-38,41-44
+  s_0a36fa17311984::t_5ee0425754f00c 13-18
+  s_0a36fa17311984::t_0b55e31c7f4d25 40
+docs/files.md
+  s_0a36fa17311984::t_cff66aa0e16851 3-4,6,12,113,115
+docs/releases/v0.4.1.md
+  s_0a36fa17311984::t_5fca704896c5d9 22,32-34
+  s_0a36fa17311984::t_befca2ead9d25f 21,30-31
+  s_0a36fa17311984::t_d1740cb5004dbe 35,38
+docs/releases/v0.4.1-verification.json
+  s_0a36fa17311984::t_2609bb1833eacd 1-2448
+docs/module-metadata-acceptance.md
+  s_0a36fa17311984::t_cff66aa0e16851 3-4,31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c94962429a726f2cde2237911e05ff436c4e8a12",
+  "prompts": {},
+  "sessions": {
+    "s_0a36fa17311984": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1daa8-3fb7-7c03-beac-1e3b4a74162a",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "LioRael <leo@lenso.dev>"
+    }
+  }
+}
