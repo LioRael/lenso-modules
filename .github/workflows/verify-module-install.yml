@@ -27,8 +27,6 @@ jobs:
   install:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 110
-    env:
-      LENSO_CACHE_DIR: ${{ runner.temp }}/lenso-official-cache
     strategy:
       fail-fast: false
       matrix:
@@ -54,6 +52,7 @@ jobs:
           auth, files = [modules[name]['releases'][-1] for name in ('auth', 'files')]
           assert auth['reference'] == files['reference']
           with open(os.environ['GITHUB_ENV'], 'a') as output:
+              output.write('LENSO_CACHE_DIR=' + os.environ['RUNNER_TEMP'] + '/lenso-official-cache\n')
               output.write(f"AUTH_MODULE_VERSION={auth['version']}\nFILES_MODULE_VERSION={files['version']}\nMODULE_SOURCE_REF={auth['reference']}\n")
           PYTHON
       - name: Wait for official GitHub API budget
