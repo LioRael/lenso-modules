@@ -1,0 +1,21 @@
+scripts/verify-module-cli.py
+  s_0a36fa17311984::t_c0777fbc64d414 70
+.github/workflows/verify-module-install.yml
+  s_0a36fa17311984::t_c0777fbc64d414 4-13,29-31,35,42,59-75,80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "04203be292313bb8b71b0b7dc1d14d7c49c774c6",
+  "prompts": {},
+  "sessions": {
+    "s_0a36fa17311984": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1daa8-3fb7-7c03-beac-1e3b4a74162a",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "LioRael <leo@lenso.dev>"
+    }
+  }
+}
