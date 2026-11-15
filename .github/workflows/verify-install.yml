@@ -22,7 +22,7 @@ jobs:
       - run: bash scripts/ci-postgres.sh
       - name: Install published CLI
         run: |
-          curl -fsSL --retry 2 https://github.com/LioRael/lenso-cli/releases/download/v1.0.0/install.sh -o "$RUNNER_TEMP/install.sh"
+          curl -fsSL --retry 2 https://github.com/LioRael/lenso-cli/releases/download/v1.1.2/install.sh -o "$RUNNER_TEMP/install.sh"
           sh "$RUNNER_TEMP/install.sh" --prefix "$RUNNER_TEMP/lenso-bin"
       - name: Generate and run both native language variants
         env:
